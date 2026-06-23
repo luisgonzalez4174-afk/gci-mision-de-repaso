@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6A33A8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GCI Misión Repaso">
+<link rel="apple-touch-icon" href="icon.svg">
 <title>GCI Galaxy · Misión de Repaso</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1324,5 +1330,17 @@ function burstStars(el){
 
 renderMap();
 </script>
+
+<div id="pwa-install" style="display:none;position:fixed;bottom:84px;right:16px;z-index:9999;background:linear-gradient(135deg,#6A33A8,#D44FA0);color:#fff;border:none;padding:12px 18px;border-radius:999px;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;box-shadow:0 4px 20px rgba(106,51,168,.6);cursor:pointer;align-items:center;gap:8px;flex-direction:row" onclick="installPWA()">
+  📲 Instalar App
+</div>
+<script>
+let _dPr;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_dPr=e;const b=document.getElementById('pwa-install');if(b)b.style.display='flex';});
+async function installPWA(){if(!_dPr)return;_dPr.prompt();const r=await _dPr.userChoice;_dPr=null;const b=document.getElementById('pwa-install');if(b)b.style.display='none';}
+window.addEventListener('appinstalled',()=>{const b=document.getElementById('pwa-install');if(b)b.style.display='none';});
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+</script>
+
 </body>
 </html>

@@ -1,0 +1,13 @@
+{
+  "name": "GCI Galaxy · Misión de Repaso",
+  "short_name": "GCI Repaso",
+  "description": "Misión de repaso interactiva — GCI Galaxy",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0F0820",
+  "theme_color": "#6A33A8",
+  "lang": "es",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>GCI Galaxy · Misión de Repaso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0F0820;--bg2:#150B2E;--card:#1F1240;--card2:#281852;
+  --purple:#6A33A8;--purple-deep:#4B1F86;--magenta:#D44FA0;
+  --gold:#F5B342;--green:#4FCB8C;--red:#E8607A;
+  --ink:#F4EFFB;--ink-soft:#BCA9E0;--line:#3A2566;
+  --radius:18px;--radius-sm:12px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:radial-gradient(ellipse 700px 500px at 12% -5%,rgba(212,79,160,.20),transparent 60%),
+    radial-gradient(ellipse 800px 600px at 90% 10%,rgba(106,51,168,.30),transparent 55%),
+    radial-gradient(ellipse 900px 700px at 50% 100%,rgba(245,179,66,.08),transparent 60%),
+    var(--bg);
+  color:var(--ink);font-family:'Manrope',sans-serif;min-height:100vh;overflow-x:hidden;position:relative;
+}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.stars span{position:absolute;border-radius:50%;opacity:.55;animation:twinkle 4s ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(.8);}50%{opacity:.9;transform:scale(1.3);}}
+@keyframes floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+@keyframes popin{from{opacity:0;transform:scale(.85) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
+@keyframes shakeit{10%,90%{transform:translateX(-2px);}20%,80%{transform:translateX(3px);}30%,50%,70%{transform:translateX(-5px);}40%,60%{transform:translateX(5px);}}
+@keyframes burst{0%{transform:translate(0,0) scale(1);opacity:1;}100%{transform:translate(var(--dx),var(--dy)) scale(.3);opacity:0;}}
+@keyframes popscale{0%{transform:scale(1);}50%{transform:scale(1.18);}100%{transform:scale(1);}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(212,79,160,.6);}50%{box-shadow:0 0 0 10px rgba(212,79,160,0);}}
+@keyframes listening{0%,100%{transform:scale(1);background:var(--red);}50%{transform:scale(1.15);background:#ff2244;}}
+
+.wrap{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:18px 16px 90px;}
+
+/* ─── topbar ─── */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-badge{width:46px;height:46px;border-radius:14px;background:linear-gradient(145deg,var(--purple),var(--purple-deep));display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 6px 18px rgba(106,51,168,.45),inset 0 0 0 1px rgba(255,255,255,.08);animation:floaty 5s ease-in-out infinite;}
+.brand-text h1{font-family:'Baloo 2',sans-serif;font-size:19px;margin:0;line-height:1.1;}
+.brand-text p{margin:1px 0 0;font-size:12px;color:var(--ink-soft);}
+.score-pill{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);padding:8px 13px;border-radius:999px;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;color:var(--gold);white-space:nowrap;}
+
+/* ─── hero ─── */
+.hero{background:linear-gradient(150deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--radius);padding:20px 20px 18px;margin-bottom:22px;position:relative;overflow:hidden;}
+.hero::after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;background:radial-gradient(circle,rgba(245,179,66,.25),transparent 70%);}
+.hero h2{font-family:'Baloo 2',sans-serif;font-size:22px;margin:0 0 6px;}
+.hero p{margin:0;color:var(--ink-soft);font-size:14.5px;line-height:1.5;}
+.hero .tag{display:inline-block;margin-top:12px;background:rgba(245,179,66,.14);color:var(--gold);border:1px solid rgba(245,179,66,.35);font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:999px;}
+
+/* ─── map path ─── */
+.path{position:relative;padding-left:26px;}
+.path::before{content:"";position:absolute;left:10px;top:6px;bottom:6px;width:3px;background:repeating-linear-gradient(to bottom,var(--purple) 0 8px,transparent 8px 16px);border-radius:3px;}
+.node{position:relative;display:flex;align-items:center;gap:14px;margin-bottom:14px;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:13px 14px;transition:transform .15s,border-color .15s,background .15s;animation:popin .4s ease both;}
+.node:hover{border-color:var(--purple);background:var(--card2);}
+.node:active{transform:scale(.98);}
+.node::before{content:"";position:absolute;left:-21px;top:50%;transform:translateY(-50%);width:13px;height:13px;border-radius:50%;background:var(--bg2);border:3px solid var(--purple);}
+.node.done::before{background:var(--gold);border-color:var(--gold);}
+.node .nbadge{width:46px;height:46px;flex:none;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.node .ninfo{flex:1;min-width:0;}
+.node .ninfo h3{font-family:'Baloo 2',sans-serif;font-size:15px;margin:0 0 2px;line-height:1.25;}
+.node .ninfo p{margin:0;font-size:12px;color:var(--ink-soft);}
+.node .nstat{font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;color:var(--ink-soft);text-align:right;flex:none;}
+.node.done .nstat{color:var(--green);}
+.node .nnum{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:12px;color:var(--ink-soft);min-width:20px;}
+
+/* ─── topic view ─── */
+.topicview{display:none;}
+.topicview.active{display:block;animation:popin .35s ease both;}
+.backbtn{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--line);color:var(--ink);font-family:'Manrope';font-weight:700;font-size:13.5px;padding:8px 13px;border-radius:999px;cursor:pointer;margin-bottom:14px;}
+.backbtn:hover{border-color:var(--purple);}
+.thead{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.thead .nbadge{width:54px;height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:26px;flex:none;}
+.thead h2{font-family:'Baloo 2',sans-serif;font-size:21px;margin:0;}
+.thead span{display:block;font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+
+/* ─── cards ─── */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 17px;margin-bottom:14px;}
+.card h4{font-family:'Baloo 2',sans-serif;font-size:13.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--gold);margin:0 0 10px;display:flex;align-items:center;gap:6px;}
+.explain p{margin:0 0 10px;font-size:14.5px;line-height:1.65;color:#EAE3F7;}
+.explain p:last-child{margin-bottom:0;}
+.explain b{color:var(--gold);}
+.ex-en{color:#fff;background:rgba(106,51,168,.35);padding:1px 6px;border-radius:6px;font-weight:600;}
+.sectionlabel{font-family:'Baloo 2',sans-serif;font-size:13px;color:var(--magenta);margin:0 0 6px;font-weight:700;}
+.reftable{width:100%;border-collapse:collapse;font-size:13px;margin:2px 0 16px;}
+.reftable th{background:rgba(106,51,168,.35);color:var(--gold);text-align:left;padding:8px 9px;font-family:'Baloo 2',sans-serif;font-size:11.5px;text-transform:uppercase;}
+.reftable td{padding:8px 9px;border-top:1px solid var(--line);color:#EAE3F7;}
+.reftable td.formcol{color:var(--green);font-weight:700;}
+.reftable tr:nth-child(even) td{background:rgba(255,255,255,.025);}
+.rulecards{display:flex;flex-direction:column;gap:10px;margin:2px 0 16px;}
+.rulecard{border:1px solid rgba(79,203,140,.4);background:rgba(79,203,140,.07);border-radius:12px;padding:11px 13px;}
+.rulecard .rulehead{display:block;color:var(--green);font-family:'Baloo 2',sans-serif;font-size:13px;margin-bottom:4px;}
+.rulecard .ruleformula{font-size:14px;color:#fff;margin-bottom:3px;}
+.rulecard .ruleex{font-size:12.5px;color:var(--ink-soft);}
+.keynote{border:1px solid rgba(245,179,66,.4);background:rgba(245,179,66,.07);border-radius:12px;padding:12px 14px;margin:2px 0 4px;}
+.keynote .keyhead{display:block;color:var(--gold);font-family:'Baloo 2',sans-serif;font-size:13.5px;margin-bottom:6px;}
+.keynote .keyrow{font-size:13.5px;color:#EAE3F7;margin-bottom:5px;line-height:1.5;}
+.keynote .keyrow:last-child{margin-bottom:0;color:var(--green);font-weight:700;}
+
+/* ─── video ─── */
+.videoplaceholder{position:relative;width:100%;padding-top:56.25%;border-radius:var(--radius-sm);overflow:hidden;background:#000;cursor:pointer;}
+.videoplaceholder img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.78;}
+.videoplaceholder .playbtn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:62px;height:62px;border-radius:50%;background:rgba(212,79,160,.92);display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;box-shadow:0 8px 22px rgba(0,0,0,.45);}
+.videoplaceholder .playlabel{position:absolute;bottom:10px;left:10px;right:10px;background:rgba(15,8,32,.7);color:#fff;font-size:11px;font-weight:700;padding:5px 9px;border-radius:8px;text-align:center;}
+.videowrap{position:relative;width:100%;padding-top:56.25%;border-radius:var(--radius-sm);overflow:hidden;background:#000;}
+.videowrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.videonote{font-size:12px;color:var(--ink-soft);margin-top:8px;}
+.videofallback{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:12.5px;font-weight:700;color:var(--gold);text-decoration:none;border:1px solid rgba(245,179,66,.35);padding:7px 12px;border-radius:999px;}
+
+/* ─── pronunciation tool ─── */
+.toolhint{font-size:12.5px;color:var(--ink-soft);margin:0 0 10px;}
+.toolgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:7px;margin-bottom:10px;}
+.toolbtn{background:linear-gradient(145deg,var(--purple),var(--purple-deep));color:#fff;border:none;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;padding:11px 4px;border-radius:10px;cursor:pointer;}
+.toolbtn:active{transform:scale(.92);}
+.toolbtn.playing{animation:popscale .35s ease;background:linear-gradient(145deg,var(--magenta),var(--purple));}
+.tooldisplay{min-height:28px;font-family:'Baloo 2',sans-serif;font-size:17px;font-weight:700;color:var(--green);text-align:center;padding:6px;}
+.toolwarn{display:none;margin-top:6px;font-size:12px;color:var(--gold);background:rgba(245,179,66,.1);border:1px solid rgba(245,179,66,.3);border-radius:9px;padding:8px 10px;}
+.toolwarn.show{display:block;}
+
+/* ─── vocab grid (new stations) ─── */
+.vocabgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px;margin-bottom:6px;}
+.vocabcard{background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:10px 6px;text-align:center;cursor:pointer;transition:.12s;}
+.vocabcard:hover{border-color:var(--purple);}
+.vocabcard.playing{border-color:var(--magenta);background:rgba(212,79,160,.1);}
+.vocabcard .vcemoji{font-size:24px;display:block;margin-bottom:4px;}
+.vocabcard .vcword{font-size:11.5px;font-weight:700;color:#fff;display:block;}
+.vocabcard .vcpron{font-size:10px;color:var(--ink-soft);display:block;margin-top:1px;}
+.vcategory{font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:700;color:var(--gold);margin:10px 0 6px;letter-spacing:.03em;text-transform:uppercase;}
+
+/* ─── exercises ─── */
+.exo{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 17px;margin-bottom:13px;}
+.exo .exo-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+.exo .exo-tag{font-family:'Baloo 2',sans-serif;font-size:11.5px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;}
+.exo .exo-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;flex:none;}
+.exo.solved .exo-check{background:var(--green);border-color:var(--green);color:#0F0820;}
+.exo .qtext{font-size:15px;font-weight:600;margin:0 0 12px;line-height:1.5;}
+.opts{display:flex;flex-direction:column;gap:8px;}
+.opts.emoji-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:8px;}
+.opt{text-align:left;background:var(--bg2);border:1.5px solid var(--line);color:var(--ink);font-family:'Manrope';font-size:14px;font-weight:600;padding:11px 13px;border-radius:11px;cursor:pointer;transition:.12s;}
+.opt.opt-emoji{text-align:center;font-size:28px;padding:12px 4px;}
+.opt:hover{border-color:var(--purple);}
+.opt.correct{background:rgba(79,203,140,.18);border-color:var(--green);color:var(--green);}
+.opt.wrong{background:rgba(232,96,122,.18);border-color:var(--red);color:var(--red);animation:shakeit .4s;}
+.opt:disabled{cursor:default;}
+.tfrow{display:flex;gap:10px;}
+.tfrow .opt{flex:1;text-align:center;}
+.fillrow{display:flex;gap:8px;flex-wrap:wrap;}
+.fillrow input{flex:1;min-width:160px;background:var(--bg2);border:1.5px solid var(--line);color:var(--ink);font-family:'Manrope';font-size:14.5px;font-weight:600;padding:11px 13px;border-radius:11px;}
+.fillrow input:focus{outline:none;border-color:var(--purple);}
+.fillrow input.correct{border-color:var(--green);background:rgba(79,203,140,.12);}
+.fillrow input.wrong{border-color:var(--red);animation:shakeit .4s;}
+.checkbtn{margin-top:10px;background:linear-gradient(145deg,var(--magenta),var(--purple));color:#fff;border:none;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13.5px;padding:10px 18px;border-radius:11px;cursor:pointer;}
+.checkbtn:disabled{opacity:.45;cursor:default;}
+.fb{margin-top:9px;font-size:13px;font-weight:600;border-radius:9px;padding:8px 11px;}
+.fb.ok{background:rgba(79,203,140,.14);color:var(--green);}
+.fb.no{background:rgba(232,96,122,.14);color:var(--red);}
+.matchgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.matchcol{display:flex;flex-direction:column;gap:8px;}
+.matchitem{background:var(--bg2);border:1.5px solid var(--line);color:var(--ink);font-family:'Manrope';font-size:12.5px;font-weight:600;padding:10px 8px;border-radius:10px;cursor:pointer;text-align:center;line-height:1.3;}
+.matchitem.sel{border-color:var(--gold);background:rgba(245,179,66,.14);}
+.matchitem.matched{border-color:var(--green);background:rgba(79,203,140,.16);color:var(--green);cursor:default;}
+.matchitem.wrong{border-color:var(--red);animation:shakeit .35s;}
+
+/* ─── ORDER type ─── */
+.order-pool{display:flex;flex-wrap:wrap;gap:7px;min-height:44px;background:rgba(0,0,0,.18);border:1.5px dashed var(--line);border-radius:11px;padding:9px 10px;margin-bottom:9px;}
+.order-answer{display:flex;flex-wrap:wrap;gap:7px;min-height:44px;background:rgba(106,51,168,.1);border:1.5px solid var(--purple);border-radius:11px;padding:9px 10px;margin-bottom:9px;}
+.order-answer.empty{background:rgba(106,51,168,.05);}
+.chip{background:linear-gradient(145deg,var(--purple),var(--purple-deep));color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13px;padding:7px 12px;border-radius:8px;cursor:pointer;border:none;transition:.12s;user-select:none;}
+.chip:hover{filter:brightness(1.15);}
+.chip.in-answer{background:linear-gradient(145deg,var(--magenta),var(--purple));}
+.chip.chip-correct{background:linear-gradient(145deg,var(--green),#2ca06a);color:#0F0820;}
+.chip.chip-wrong{background:linear-gradient(145deg,var(--red),#b03050);animation:shakeit .4s;}
+.order-labels{display:flex;gap:8px;font-size:11px;color:var(--ink-soft);margin-bottom:5px;}
+.order-labels span{flex:1;}
+
+/* ─── SPEAK type ─── */
+.speak-phrase{background:rgba(106,51,168,.18);border:1px solid var(--purple);border-radius:12px;padding:14px 16px;margin-bottom:12px;text-align:center;}
+.speak-phrase .phrase-text{font-family:'Baloo 2',sans-serif;font-size:20px;font-weight:700;color:#fff;display:block;margin-bottom:4px;}
+.speak-phrase .phrase-tr{font-size:12.5px;color:var(--ink-soft);}
+.speak-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.micbtn{width:54px;height:54px;border-radius:50%;background:var(--magenta);border:none;color:#fff;font-size:22px;cursor:pointer;flex:none;transition:.12s;box-shadow:0 4px 14px rgba(212,79,160,.4);}
+.micbtn:hover{filter:brightness(1.1);}
+.micbtn.recording{animation:listening .7s ease-in-out infinite;box-shadow:0 0 0 4px rgba(232,96,122,.35);}
+.speak-transcript{flex:1;min-width:120px;background:var(--bg2);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;color:var(--ink-soft);min-height:40px;}
+.speak-result{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.speak-markbtn{background:none;border:1.5px solid var(--green);color:var(--green);font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13px;padding:9px 14px;border-radius:10px;cursor:pointer;}
+.speak-markbtn:hover{background:rgba(79,203,140,.1);}
+.speak-playbtn{background:none;border:1.5px solid var(--purple);color:var(--ink);font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13px;padding:9px 14px;border-radius:10px;cursor:pointer;}
+.speak-status{font-size:12px;color:var(--ink-soft);margin-top:7px;font-style:italic;}
+
+/* ─── CHAT station ─── */
+.chat-header{background:linear-gradient(145deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px;}
+.chat-header h3{font-family:'Baloo 2',sans-serif;font-size:17px;margin:0 0 6px;}
+.chat-header p{margin:0;font-size:13px;color:var(--ink-soft);line-height:1.5;}
+.scenario-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.scenario-pill{background:var(--bg2);border:1.5px solid var(--line);color:var(--ink);font-family:'Baloo 2',sans-serif;font-weight:700;font-size:12.5px;padding:8px 13px;border-radius:999px;cursor:pointer;transition:.12s;}
+.scenario-pill.active{border-color:var(--gold);background:rgba(245,179,66,.12);color:var(--gold);}
+.chatbox{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;}
+.chat-messages{max-height:380px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.chat-msg{max-width:85%;display:flex;gap:8px;align-items:flex-end;}
+.chat-msg.bot{align-self:flex-start;}
+.chat-msg.user{align-self:flex-end;flex-direction:row-reverse;}
+.chat-bubble{padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.5;}
+.chat-msg.bot .chat-bubble{background:var(--card2);border-bottom-left-radius:4px;}
+.chat-msg.user .chat-bubble{background:linear-gradient(135deg,var(--purple),var(--purple-deep));border-bottom-right-radius:4px;}
+.chat-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(145deg,var(--magenta),var(--purple));display:flex;align-items:center;justify-content:center;font-size:14px;flex:none;}
+.chat-hint{font-size:12px;color:var(--ink-soft);font-style:italic;margin-top:4px;}
+.chat-speak-btn{background:none;border:none;color:var(--gold);font-size:16px;cursor:pointer;padding:2px 4px;opacity:.7;}
+.chat-speak-btn:hover{opacity:1;}
+.chat-input-area{border-top:1px solid var(--line);padding:12px 14px;display:flex;gap:8px;align-items:center;}
+.chat-input{flex:1;background:var(--card);border:1.5px solid var(--line);color:var(--ink);font-family:'Manrope';font-size:14px;font-weight:500;padding:10px 13px;border-radius:11px;}
+.chat-input:focus{outline:none;border-color:var(--purple);}
+.chat-micbtn{width:42px;height:42px;border-radius:50%;background:var(--magenta);border:none;color:#fff;font-size:18px;cursor:pointer;flex:none;}
+.chat-micbtn.recording{animation:listening .7s ease-in-out infinite;}
+.chat-sendbtn{background:linear-gradient(145deg,var(--magenta),var(--purple));color:#fff;border:none;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13.5px;padding:10px 16px;border-radius:11px;cursor:pointer;white-space:nowrap;}
+.suggestions{padding:10px 14px 12px;display:flex;flex-wrap:wrap;gap:7px;border-top:1px solid var(--line);}
+.sugg-pill{background:rgba(106,51,168,.25);border:1px solid rgba(106,51,168,.5);color:var(--ink);font-family:'Manrope';font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:999px;cursor:pointer;transition:.12s;}
+.sugg-pill:hover{border-color:var(--magenta);background:rgba(212,79,160,.18);}
+.chat-progress{font-family:'Baloo 2',sans-serif;font-size:13px;font-weight:700;color:var(--gold);padding:8px 14px;border-top:1px solid var(--line);}
+
+.donebar{display:none;align-items:center;gap:10px;background:linear-gradient(145deg,rgba(79,203,140,.18),rgba(79,203,140,.06));border:1px solid rgba(79,203,140,.4);color:var(--green);font-family:'Baloo 2',sans-serif;font-weight:700;padding:13px 16px;border-radius:var(--radius);margin-top:6px;font-size:14.5px;}
+.donebar.show{display:flex;animation:popin .4s ease both;}
+footer{text-align:center;font-size:11.5px;color:var(--ink-soft);margin-top:30px;opacity:.7;}
+@media(min-width:560px){.hero h2{font-size:25px;}}
+</style>
+</head>
+<body>
+<div class="stars" id="starfield"></div>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-badge">🪐</div>
+      <div class="brand-text"><h1>GCI Galaxy</h1><p>Misión de Repaso</p></div>
+    </div>
+    <div class="score-pill">⭐ <span id="scoreText">0/0</span></div>
+  </div>
+
+  <div id="mapview">
+    <div class="hero">
+      <h2>¡Hola, cadete! 🚀</h2>
+      <p>Viajaremos por <b>16 estaciones</b> con explicación, videos, pronunciación, 20 ejercicios por estación, estaciones de vocabulario extra y una sala de conversación real. Explora la galaxia a tu ritmo.</p>
+      <span class="tag">Repaso · Unidades 1 y 2 · GCI Workbook 0</span>
+    </div>
+    <div class="path" id="pathList"></div>
+  </div>
+
+  <div class="topicview" id="topicview">
+    <button class="backbtn" onclick="goMap()">← Volver al mapa</button>
+    <div class="thead">
+      <div class="nbadge" id="tvBadge"></div>
+      <div><h2 id="tvTitle"></h2><span id="tvSub"></span></div>
+    </div>
+    <div class="card explain" id="tvExplainCard">
+      <h4>🛰️ Explicación</h4>
+      <div id="tvExplainBody"></div>
+    </div>
+    <div class="card" id="tvVideoCard">
+      <h4>🎬 Video</h4>
+      <div id="tvVideoWrap"></div>
+      <div class="videonote" id="tvVideoNote"></div>
+      <a class="videofallback" id="tvVideoFallback" href="#" target="_blank" rel="noopener">▶ Ver en YouTube</a>
+    </div>
+    <div class="card" id="tvToolCard" style="display:none;">
+      <h4>🔊 Pronunciación interactiva</h4>
+      <div id="tvToolBody"></div>
+    </div>
+    <div class="card" id="tvVocabCard" style="display:none;">
+      <h4>📚 Vocabulario — toca para escuchar</h4>
+      <div id="tvVocabBody"></div>
+    </div>
+    <div id="tvExercises"></div>
+    <!-- CHAT STATION CONTAINER -->
+    <div id="tvChatSection" style="display:none;">
+      <div class="chat-header">
+        <h3>💬 Sala de Conversación</h3>
+        <p>Practica en inglés con tu compañero virtual Alex. Elige un escenario y empieza a hablar — usa el micrófono 🎤 o escribe.</p>
+        <div class="scenario-pills" id="scenarioPills"></div>
+      </div>
+      <div class="chatbox">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="suggestions" id="chatSuggestions"></div>
+        <div class="chat-progress" id="chatProgress"></div>
+        <div class="chat-input-area">
+          <input class="chat-input" id="chatInput" type="text" placeholder="Type your answer in English..." autocomplete="off">
+          <button class="chat-micbtn" id="chatMicBtn" title="Hablar">🎤</button>
+          <button class="chat-sendbtn" onclick="chatSend()">Send →</button>
+        </div>
+      </div>
+    </div>
+    <div class="donebar" id="tvDone">🌟 ¡Estación completada! Excelente trabajo, cadete.</div>
+  </div>
+
+  <footer>Material de repaso para los alumnos de GCI Galaxy · Centro de Idiomas · Basado en GCI Workbook 0</footer>
+</div>
+<script>
+(function(){
+  const sf=document.getElementById('starfield');
+  for(let i=0;i<55;i++){
+    const s=document.createElement('span');
+    s.style.left=Math.random()*100+'%';
+    s.style.top=Math.random()*100+'%';
+    s.style.animationDelay=(Math.random()*4)+'s';
+    const sz=(Math.random()*2+1.5)+'px';
+    s.style.width=s.style.height=sz;
+    sf.appendChild(s);
+  }
+})();
+const COLORS=["#6A33A8","#D44FA0","#F5B342","#3FB8AF","#5B7FE8","#E8607A","#9B59B6","#27AE60","#E74C3C","#F39C12","#1ABC9C","#3498DB","#E91E63","#FF9800","#795548","#607D8B"];
+</script>
+<script>
+const TOPICS=[
+{id:"greet",num:1,title:"Saludos y ¿Cómo estás?",emoji:"👋",cardDesc:"Hi, How you doing?, What's up? — saludos del día a día",
+explain:[
+"<p>Para saludar usamos <span class='ex-en'>Hi</span> o <span class='ex-en'>Hello</span> a cualquier hora, o según el momento: <span class='ex-en'>Good morning</span> (mañana), <span class='ex-en'>Good afternoon</span> (tarde) y <span class='ex-en'>Good evening</span> (noche).</p>",
+"<p>Para preguntar '¿cómo estás?' en inglés cotidiano usamos formas <b>casuales</b> — NO 'How are you?' que suena muy formal y de libro de texto. Las más comunes son: <span class='ex-en'>How you doing?</span> · <span class='ex-en'>How's it going?</span> · <span class='ex-en'>What's up?</span> · <span class='ex-en'>How's everything going?</span></p>",
+"<p>Respuestas naturales: <span class='ex-en'>I'm doing good</span> · <span class='ex-en'>I'm doing great</span> · <span class='ex-en'>Not bad at all</span> · <span class='ex-en'>Pretty good, thanks</span> · <span class='ex-en'>Can't complain</span> · <span class='ex-en'>So-so</span>. Siempre regresa la pregunta: <span class='ex-en'>And you? / And yourself?</span></p>",
+"<p>Para presentarte: <span class='ex-en'>I'm + nombre</span>. Cuando alguien se presenta respondes: <span class='ex-en'>Nice to meet you!</span></p>"
+],
+video:"5Z62Fku1HXo",videoNote:"Greetings & Introductions for Beginners (A1)",
+exercises:[
+{type:"mcq",q:"Tu compañero te dice: 'Nice to meet you.' ¿Cuál es la mejor respuesta?",options:["Good morning","Nice to meet you too","I'm fine, thanks","Bye-bye"],correct:1},
+{type:"fill",q:"Completa: A: Hi, I'm Diego. B: Hi Diego, ____ ____ ____ ____.",answers:["nice to meet you","nice to meet you too"]},
+{type:"mcq",q:"¿Cuál de estas formas de saludar es la MÁS usada en conversación real (no formal)?",options:["How are you?","How you doing?","Good morning, how do you do?","How dost thou fare?"],correct:1},
+{type:"match",q:"Une cada saludo con su mejor respuesta.",pairs:[["Good morning","Good morning! / Hey!"],["How you doing?","I'm doing good! And you?"],["Nice to meet you.","Nice to meet you too!"],["What's up?","Not much, just chilling."]]},
+{type:"emoji",q:"Dices 'I'm doing good!' — ¿qué emoji lo representa mejor?",options:["🙂","😢","😡","😴"],correct:0},
+{type:"emoji",q:"¿Qué emoji representa 'Awful'?",options:["😄","😣","😎","🥳"],correct:1},
+{type:"emoji",q:"¿Qué emoji representa 'So-so'?",options:["😄","😡","😐","😭"],correct:2},
+{type:"mcq",q:"Es la 1:00 PM. ¿Cómo saludas?",options:["Good morning","Good afternoon","Good evening","Good night"],correct:1},
+{type:"fill",q:"Completa la respuesta casual: 'I'm doing ____.' (bien/genial)",answers:["good","great","fine","well"]},
+{type:"tf",q:"'Good evening' se usa para saludar en la mañana.",correct:false},
+{type:"order",q:"Ordena el saludo más casual:",words:["doing","How","you","?"],correct:"How you doing ?"},
+{type:"order",q:"Ordena para presentarte:",words:["Luis","I'm","Hi,"],correct:"Hi, I'm Luis"},
+{type:"order",q:"Ordena la respuesta:",words:["meet","you","Nice","to","."],correct:"Nice to meet you ."},
+{type:"speak",phrase:"Hey! How you doing?",translation:"¡Hola! ¿Cómo estás? (forma casual)"},
+{type:"speak",phrase:"I'm doing great, thanks! And you?",translation:"¡Estoy genial, gracias! ¿Y tú?"},
+{type:"mcq",q:"Son las 7:30 AM. Un compañero llega a la clase. ¿Qué dices?",options:["Good night","Good afternoon","Good morning","Good evening"],correct:2},
+{type:"fill",q:"A: How's it ____? B: Not bad, thanks.",answers:["going"]},
+{type:"match",q:"Une la respuesta de saludo con el nivel de ánimo.",pairs:[["I'm doing great!","Muy bien / Excelente"],["So-so.","Regular"],["Awful!","Muy mal"],["Not bad at all.","Bastante bien"]]},
+{type:"tf",q:"'How you doing?' y 'How's it going?' son formas MÁS casuales y comunes que 'How are you?'.",correct:true},
+{type:"speak",phrase:"What's up? How's it going?",translation:"¿Qué onda? ¿Cómo va todo? (muy casual)"}
+]},
+
+{id:"bye",num:2,title:"Despedidas",emoji:"🌙",cardDesc:"Bye, See you later, Take care, Good night",
+explain:[
+"<p>Para despedirte usa: <span class='ex-en'>Bye</span>, <span class='ex-en'>Bye-bye</span>, o <span class='ex-en'>Goodbye</span> (formal). Si la verás pronto: <span class='ex-en'>See you later</span> o <span class='ex-en'>See you tomorrow</span>.</p>",
+"<p><span class='ex-en'>Take care</span> = cuídate. <b>Good night</b> solo se usa antes de dormir, ¡nunca como saludo! Para saludar de noche usamos <span class='ex-en'>Good evening</span>.</p>"
+],
+video:"MHi11sn2SRI",videoNote:"How to Say Goodbye in English | ESL Lesson",
+exercises:[
+{type:"mcq",q:"Tu amigo se va a dormir. ¿Qué le dices?",options:["Good night","Good morning","See you tomorrow","Nice to meet you"],correct:0},
+{type:"fill",q:"Vas a ver a tu amigo mañana: Bye, ____ ____ ____.",answers:["see you tomorrow"]},
+{type:"tf",q:"'Bye-bye' es muy formal, solo para reuniones de trabajo.",correct:false},
+{type:"mcq",q:"¿Cuál es un SALUDO y NO una despedida?",options:["Take care","Good afternoon","See you later","Good-bye"],correct:1},
+{type:"fill",q:"Despídete de forma informal en una sola palabra: ____.",answers:["bye"]},
+{type:"mcq",q:"¿Cuál despedida es la MÁS formal?",options:["Bye","See you later","Goodbye","Take care"],correct:2},
+{type:"emoji",q:"¿Qué emoji va mejor con 'Good night'?",options:["☀️","🌙","👋","😄"],correct:1},
+{type:"tf",q:"'See you tomorrow' significa que la verás mañana.",correct:true},
+{type:"match",q:"Une la despedida con la situación.",pairs:[["Good night","Te vas a dormir"],["See you later","La verás en un rato"],["Take care","Despedida cariñosa"],["Goodbye","Despedida formal"]]},
+{type:"mcq",q:"Tu maestro se despide al final de clase. Dice probablemente:",options:["Bye-bye!","Goodbye, see you next class.","Catch ya later!","Cheerio!"],correct:1},
+{type:"order",q:"Ordena la despedida:",words:["you","See","later","!"],correct:"See you later !"},
+{type:"order",q:"Ordena:",words:["care","Take","!"],correct:"Take care !"},
+{type:"speak",phrase:"Goodbye! See you tomorrow.",translation:"¡Adiós! Nos vemos mañana."},
+{type:"speak",phrase:"Take care! Have a great day.",translation:"¡Cuídate! Que tengas un buen día."},
+{type:"fill",q:"Quieres decir 'cuídate' en inglés: ____ ____.",answers:["take care"]},
+{type:"mcq",q:"'Farewell' es otra forma de decir:",options:["Hello","Goodbye","How are you","Nice to meet you"],correct:1},
+{type:"match",q:"Une la hora del día con el saludo correcto.",pairs:[["8:00 AM","Good morning"],["2:00 PM","Good afternoon"],["8:00 PM","Good evening"],["11:30 PM (al acostarse)","Good night"]]},
+{type:"tf",q:"'Good evening' puede usarse tanto para saludar como para despedirse de noche.",correct:true},
+{type:"speak",phrase:"Good night! See you tomorrow.",translation:"¡Buenas noches! Nos vemos mañana."},
+{type:"fill",q:"A: See you ____! B: Bye!",answers:["later","tomorrow","soon"]}
+]},
+
+{id:"articles",num:3,title:"Artículos a / an / the",emoji:"🔤",cardDesc:"Cuándo usar a, an, the (¡o ningún artículo!)",
+explain:[
+"<p>Usamos <b>a</b> antes de sonido de consonante: <span class='ex-en'>a book, a university</span> (suena 'yu'). Usamos <b>an</b> antes de sonido de vocal: <span class='ex-en'>an apple, an hour</span> (h muda).</p>",
+"<p><b>the</b> se usa cuando el sustantivo ya es conocido o específico. Sin artículo cuando hablamos en general: <span class='ex-en'>Books are interesting.</span></p>"
+],
+video:"14tELYrXX2I",videoNote:"Articles in English | a, an, the",
+exercises:[
+{type:"fill",q:"I'm ____ engineer.",answers:["an"]},
+{type:"fill",q:"She's ____ teacher.",answers:["a"]},
+{type:"mcq",q:"Ya mencionaste al maestro antes. Dices: '____ teacher is from Canada.'",options:["A","An","The"],correct:2},
+{type:"mcq",q:"¿Cuál es correcta?",options:["a apple","an apple","an the apple"],correct:1},
+{type:"fill",q:"I have ____ cat.",answers:["a"]},
+{type:"fill",q:"She has ____ orange.",answers:["an"]},
+{type:"mcq",q:"'Books are interesting' — ¿qué regla aplica?",options:["Identidad no conocida","Identidad conocida","General (sin artículo)"],correct:2},
+{type:"tf",q:"'University' usa 'an' porque la letra 'u' es vocal.",correct:false},
+{type:"match",q:"Une cada palabra con su artículo.",pairs:[["apple","an"],["book","a"],["hour","an"],["university","a"]]},
+{type:"mcq",q:"¿Cuál es correcta?",options:["I am the student.","I am a student.","I am student."],correct:1},
+{type:"order",q:"Ordena la oración:",words:["a","I'm","teacher","."],correct:"I'm a teacher ."},
+{type:"order",q:"Ordena:",words:["umbrella","an","She","has","."],correct:"She has an umbrella ."},
+{type:"order",q:"Ordena:",words:["engineer","He's","an","."],correct:"He's an engineer ."},
+{type:"speak",phrase:"I'm a student.",translation:"Soy estudiante."},
+{type:"speak",phrase:"She's an architect.",translation:"Ella es arquitecta."},
+{type:"fill",q:"I see ____ moon in the sky.",answers:["a","the"]},
+{type:"mcq",q:"¿Cuál usa 'an'?",options:["a cat","an eraser","a university","a hotel"],correct:1},
+{type:"tf",q:"'An' se usa cuando la SIGUIENTE PALABRA empieza con SONIDO de vocal (no solo letra).",correct:true},
+{type:"fill",q:"He's ____ honest man. (honest: la 'h' es muda)",answers:["an"]},
+{type:"match",q:"Une a/an con la palabra correcta.",pairs:[["a","dog"],["an","elephant"],["a","window"],["an","umbrella"]]}
+]},
+
+{id:"jobs",num:5,title:"Ocupaciones",emoji:"💼",cardDesc:"Vocabulario de trabajos + What do you do?",
+explain:[
+"<p>Vocabulario: <span class='ex-en'>teacher, student, architect, banker, actor, singer, chef, doctor, engineer, pilot, photographer, scientist</span>.</p>",
+"<p>Para preguntar: <b>What do you do?</b> Para responder: <b>I'm a/an + ocupación.</b> De otra persona: <span class='ex-en'>She's a chef. He's a pilot.</span></p>"
+],
+video:"yzLh9Y9oOmA",videoNote:"Jobs and Occupations Vocabulary",
+exercises:[
+{type:"match",q:"Une a la persona con su ocupación.",pairs:[["She flies planes.","Pilot"],["He cooks at a restaurant.","Chef"],["She takes care of patients.","Doctor"],["He teaches English.","Teacher"]]},
+{type:"fill",q:"A: What do you do? B: I'm ____ architect.",answers:["an"]},
+{type:"mcq",q:"Elige la oración correcta:",options:["She a doctor.","She's a doctor.","She the doctor."],correct:1},
+{type:"fill",q:"He's a photographer. He takes ____.",answers:["photos","pictures","photographs"]},
+{type:"fill",q:"What ____ you do?",answers:["do"]},
+{type:"mcq",q:"Un 'banker' trabaja en:",options:["un hospital","un banco","una escuela","un avión"],correct:1},
+{type:"emoji",q:"¿Qué emoji representa 'doctor'?",options:["👩‍⚕️","👨‍🍳","👩‍🎤","👮"],correct:0},
+{type:"tf",q:"'Flight attendant' trabaja en un avión.",correct:true},
+{type:"fill",q:"She's a writer. She writes ____.",answers:["books","stories","novels"]},
+{type:"match",q:"Une ocupación con lugar de trabajo.",pairs:[["teacher","school"],["chef","restaurant"],["scientist","laboratory"],["banker","bank"]]},
+{type:"order",q:"Ordena la pregunta:",words:["do","What","you","do","?"],correct:"What do you do ?"},
+{type:"order",q:"Ordena la respuesta:",words:["a","I'm","singer","."],correct:"I'm a singer ."},
+{type:"order",q:"Ordena:",words:["an","engineer","He's","."],correct:"He's an engineer ."},
+{type:"speak",phrase:"What do you do?",translation:"¿A qué te dedicas?"},
+{type:"speak",phrase:"I'm a teacher. I work at a school.",translation:"Soy maestro. Trabajo en una escuela."},
+{type:"mcq",q:"¿Quién hace fotografías?",options:["singer","photographer","manager","writer"],correct:1},
+{type:"tf",q:"Para todas las ocupaciones usamos 'a' (nunca 'an').",correct:false},
+{type:"fill",q:"A: Is she a doctor? B: Yes, she ____.",answers:["is"]},
+{type:"match",q:"Une la ocupación con lo que hace.",pairs:[["musician","plays instruments"],["pilot","flies planes"],["doctor","helps patients"],["artist","paints and draws"]]},
+{type:"speak",phrase:"She's an architect. She designs buildings.",translation:"Ella es arquitecta. Diseña edificios."}
+]},
+
+{id:"alphabet",num:6,title:"El abecedario",emoji:"🔠",cardDesc:"Las 26 letras y su pronunciación correcta",
+explain:[
+"<p>El alfabeto en inglés tiene 26 letras. Confusiones frecuentes: <b>B</b> /bi/ vs <b>V</b> /vi/ · <b>M</b> /em/ vs <b>N</b> /en/ · <b>G</b> /yi/ vs <b>J</b> /yei/ · <b>I</b> /ai/ vs <b>E</b> /i/ · <b>W</b> = 'double U'.</p>",
+"<p>Toca la herramienta de abajo para escuchar cada letra. La voz es del navegador — en Chrome/Edge en inglés suena mejor.</p>"
+],
+video:"2s24iGVE4ZA",videoNote:"The English Alphabet | ABC for Adults",
+tool:{hint:"Toca una letra para escuchar su nombre en inglés 🔊",items:[
+{label:"A",speak:"A",phon:"ei"},{label:"B",speak:"B",phon:"bi"},{label:"C",speak:"C",phon:"si"},
+{label:"D",speak:"D",phon:"di"},{label:"E",speak:"E",phon:"i"},{label:"F",speak:"F",phon:"ef"},
+{label:"G",speak:"G",phon:"yi"},{label:"H",speak:"H",phon:"eich"},{label:"I",speak:"I",phon:"ai"},
+{label:"J",speak:"J",phon:"yei"},{label:"K",speak:"K",phon:"kei"},{label:"L",speak:"L",phon:"el"},
+{label:"M",speak:"M",phon:"em"},{label:"N",speak:"N",phon:"en"},{label:"O",speak:"O",phon:"ou"},
+{label:"P",speak:"P",phon:"pi"},{label:"Q",speak:"Q",phon:"kiu"},{label:"R",speak:"R",phon:"ar"},
+{label:"S",speak:"S",phon:"es"},{label:"T",speak:"T",phon:"ti"},{label:"U",speak:"U",phon:"iu"},
+{label:"V",speak:"V",phon:"vi"},{label:"W",speak:"double U",phon:"dóbel-iu"},{label:"X",speak:"X",phon:"eks"},
+{label:"Y",speak:"Y",phon:"uai"},{label:"Z",speak:"Z",phon:"zi"}]},
+exercises:[
+{type:"mcq",q:"¿Cuál letra se confunde más con 'V'?",options:["B","F","N","Q"],correct:0},
+{type:"fill",q:"Secuencia: A, B, C, ____, E",answers:["d"]},
+{type:"match",q:"Une cada letra con la que más se confunde.",pairs:[["B","V"],["M","N"],["G","J"],["I","E"]]},
+{type:"match",q:"Relaciona A-F con su pronunciación.",pairs:[["A","ei"],["B","bi"],["C","si"],["D","di"],["E","i"],["F","ef"]]},
+{type:"match",q:"Relaciona G-M con su pronunciación.",pairs:[["G","yi"],["H","eich"],["I","ai"],["J","yei"],["K","kei"],["L","el"],["M","em"]]},
+{type:"match",q:"Relaciona N-S con su pronunciación.",pairs:[["N","en"],["O","ou"],["P","pi"],["Q","kiu"],["R","ar"],["S","es"]]},
+{type:"match",q:"Relaciona T-Z con su pronunciación.",pairs:[["T","ti"],["U","iu"],["V","vi"],["W","dóbel-iu"],["X","eks"],["Y","uai"],["Z","zi"]]},
+{type:"mcq",q:"¿Cómo se pronuncia 'G' en inglés?",options:["yi","yei","yu"],correct:0},
+{type:"mcq",q:"¿Cómo se pronuncia 'Q' en inglés?",options:["kiu","ki","kuiu"],correct:0},
+{type:"tf",q:"La letra 'W' se llama 'double-u' en inglés.",correct:true},
+{type:"order",q:"Ordena las primeras 5 letras:",words:["C","A","E","B","D"],correct:"A B C D E"},
+{type:"speak",phrase:"A B C D E F G",translation:"Di las primeras 7 letras del abecedario"},
+{type:"speak",phrase:"My name is... M-A-R-I-A",translation:"Mi nombre es... M-A-R-I-A (deletreando)"},
+{type:"fill",q:"La letra después de 'P' es: ____.",answers:["q"]},
+{type:"fill",q:"La letra antes de 'Z' es: ____.",answers:["y"]},
+{type:"mcq",q:"¿Cómo se deletrea 'YES' en inglés?",options:["wai-i-es","uai-i-es","uai-i-si"],correct:1},
+{type:"tf",q:"'E' en inglés suena como la 'i' del español.",correct:true},
+{type:"mcq",q:"¿Cuántas letras tiene el alfabeto en inglés?",options:["24","25","26","27"],correct:2},
+{type:"speak",phrase:"How do you spell your name?",translation:"¿Cómo se deletrea tu nombre?"},
+{type:"fill",q:"'H' en inglés se pronuncia: ____.",answers:["eich","eich"]}
+]}];
+</script>
+<script>
+TOPICS.push(...[
+{id:"bever",num:8,title:"El verbo Be",emoji:"🌟",cardDesc:"am / is / are — el verbo más importante",
+explain:["<p>I <b>am</b> · You <b>are</b> · He/She/It <b>is</b> · We <b>are</b> · They <b>are</b>. Estructura: <b>Subject + be + Noun/Adjective.</b> Es irregular — no cambia con -s.</p>"],
+video:"vE5WvOVM7HI",videoNote:"Cómo usar AM, IS, ARE — verbo to be",
+exercises:[
+{type:"fill",q:"I ____ a student.",answers:["am"]},
+{type:"fill",q:"They ____ doctors.",answers:["are"]},
+{type:"mcq",q:"Elige la oración correcta:",options:["She are a doctor.","She is a doctor.","She am a doctor."],correct:1},
+{type:"fill",q:"My parents ____ engineers.",answers:["are"]},
+{type:"fill",q:"You ____ my friend.",answers:["are"]},
+{type:"fill",q:"He ____ a musician.",answers:["is"]},
+{type:"mcq",q:"Elige la oración correcta:",options:["I is a student.","I am a student.","I are a student."],correct:1},
+{type:"tf",q:"El verbo 'be' cambia según el sujeto.",correct:true},
+{type:"match",q:"Une sujeto con forma del verbo be.",pairs:[["I","am"],["You","are"],["He","is"],["They","are"]]},
+{type:"fill",q:"We ____ from Mexico.",answers:["are"]},
+{type:"order",q:"Ordena la oración:",words:["a","I","am","student","."],correct:"I am a student ."},
+{type:"order",q:"Ordena:",words:["teachers","They","are","."],correct:"They are teachers ."},
+{type:"order",q:"Ordena:",words:["pilot","He","is","a","."],correct:"He is a pilot ."},
+{type:"speak",phrase:"I am a student.",translation:"Soy estudiante."},
+{type:"speak",phrase:"We are from Mexico.",translation:"Somos de México."},
+{type:"fill",q:"It ____ cold today.",answers:["is"]},
+{type:"mcq",q:"¿Cuál es correcta?",options:["She are happy.","She is happy.","She am happy."],correct:1},
+{type:"tf",q:"'They is' es una forma correcta del verbo be.",correct:false},
+{type:"match",q:"Une cada sujeto con su forma del verbo be.",pairs:[["She","is"],["We","are"],["It","is"],["I","am"]]},
+{type:"speak",phrase:"He is a doctor. She is a nurse.",translation:"Él es doctor. Ella es enfermera."}
+]},
+
+{id:"contractions",num:9,title:"Contracciones",emoji:"✂️",cardDesc:"I'm, you're, isn't, aren't…",
+explain:[
+"<p>Contracciones con be: <span class='ex-en'>I'm, you're, he's, she's, it's, we're, they're</span>. Negativas: <span class='ex-en'>isn't, aren't</span>.</p>",
+"<p>⚠️ Para 'I am not' NO existe 'amn't'. Solo decimos <b>I'm not</b>. En respuesta afirmativa NUNCA se contrae: <b>Yes, I am</b> (no 'Yes, I'm').</p>"
+],
+video:"t7trGMcDaVw",videoNote:"Contractions with to Be — English",
+exercises:[
+{type:"mcq",q:"¿Contracción de 'She is'?",options:["She's","Shes'","She're"],correct:0},
+{type:"fill",q:"They are not ready. → They ____ ready.",answers:["aren't","are not"]},
+{type:"mcq",q:"¿Correcto para 'I am not'?",options:["I amn't","I'm not","I amn"],correct:1},
+{type:"fill",q:"He is a doctor. → ____ a doctor.",answers:["he's"]},
+{type:"fill",q:"It is sunny. → ____ sunny.",answers:["it's"]},
+{type:"fill",q:"We are ready. → ____ ready.",answers:["we're"]},
+{type:"mcq",q:"¿Contracción de 'They are'?",options:["They's","They're","Theyre"],correct:1},
+{type:"tf",q:"'Isn't' es la contracción de 'is not'.",correct:true},
+{type:"match",q:"Une la forma larga con su contracción.",pairs:[["I am","I'm"],["You are","You're"],["She is","She's"],["They are","They're"]]},
+{type:"fill",q:"He is not late. → He ____ late.",answers:["isn't"]},
+{type:"order",q:"Ordena la oración contraída:",words:["a","She's","doctor","."],correct:"She's a doctor ."},
+{type:"order",q:"Ordena la negativa:",words:["ready.","aren't","They"],correct:"They aren't ready."},
+{type:"speak",phrase:"I'm a student. I'm not a teacher.",translation:"Soy estudiante. No soy maestro."},
+{type:"speak",phrase:"He's from Mexico. She's from Canada.",translation:"Él es de México. Ella es de Canadá."},
+{type:"fill",q:"You ____ my best friend! (forma positiva contraída)",answers:["you're","'re"]},
+{type:"mcq",q:"¿Cuál respuesta es INCORRECTA?",options:["Yes, I am.","No, I'm not.","Yes, I'm."],correct:2},
+{type:"tf",q:"'We're' es la contracción de 'We are'.",correct:true},
+{type:"match",q:"Une la negativa larga con la contraída.",pairs:[["is not","isn't"],["are not","aren't"],["I am not","I'm not"],["he is not","he isn't"]]},
+{type:"speak",phrase:"They're students. We're teachers.",translation:"Ellos son estudiantes. Nosotros somos maestros."},
+{type:"order",q:"Ordena la oración:",words:["late.","I'm","not"],correct:"I'm not late."}
+]},
+
+{id:"titles",num:11,title:"Mr. / Mrs. / Miss / Ms.",emoji:"🎩",cardDesc:"Uso y pronunciación correcta de los títulos",
+explain:[
+"<p><b>Mr.</b> /mis-ter/ → cualquier hombre. <b>Mrs.</b> /mis-iz/ → mujer casada (no se pronuncia como se escribe). <b>Miss</b> /mis/ → mujer soltera. <b>Ms.</b> /miz/ → cualquier mujer (neutral, la más segura).</p>"
+],
+video:"9W9gW4XHgk0",videoNote:"Mr. Mrs. Miss Ms. — uso y pronunciación",
+tool:{hint:"Toca un título para escuchar su pronunciación 🔊",items:[
+{label:"Mr.",speak:"Mister",phon:"mis-ter"},
+{label:"Mrs.",speak:"Missus",phon:"mis-iz"},
+{label:"Miss",speak:"Miss",phon:"mis"},
+{label:"Ms.",speak:"Mizz",phon:"miz"}]},
+exercises:[
+{type:"mcq",q:"¿Cómo se pronuncia 'Mrs.'?",options:["mis-iz","mis","mister","miz"],correct:0},
+{type:"mcq",q:"No sabes si una mujer está casada. ¿Qué título usas?",options:["Mrs.","Miss","Ms.","Mr."],correct:2},
+{type:"match",q:"Une cada título con su significado.",pairs:[["Mr.","Cualquier hombre"],["Mrs.","Mujer casada"],["Miss","Mujer soltera"],["Ms.","Cualquier mujer (neutral)"]]},
+{type:"fill",q:"Mr. Charles Sullivan — 'Charles' es su ____ name.",answers:["first"]},
+{type:"mcq",q:"¿Cómo se pronuncia 'Miss'?",options:["mis","mis-iz","miz"],correct:0},
+{type:"mcq",q:"¿Cómo se pronuncia 'Mr.'?",options:["mis-ter","mis-iz","miz"],correct:0},
+{type:"fill",q:"Una mujer casada, título tradicional: ____.",answers:["mrs","mrs."]},
+{type:"tf",q:"'Ms.' indica si una mujer está casada o soltera.",correct:false},
+{type:"match",q:"Une cada título con su pronunciación.",pairs:[["Mr.","mis-ter"],["Mrs.","mis-iz"],["Miss","mis"],["Ms.","miz"]]},
+{type:"mcq",q:"Una niña pequeña en la escuela. ¿Qué título usas?",options:["Mrs.","Miss","Ms.","Mr."],correct:1},
+{type:"speak",phrase:"Good morning, Mr. García.",translation:"Buenos días, señor García."},
+{type:"speak",phrase:"Nice to meet you, Ms. López.",translation:"Mucho gusto, señorita/señora López."},
+{type:"order",q:"Ordena la presentación:",words:["Smith.","This","is","Mrs."],correct:"This is Mrs. Smith."},
+{type:"tf",q:"'Mr.' se puede usar para un hombre soltero.",correct:true},
+{type:"mcq",q:"Tu maestro varón. ¿Qué título usas para dirigirte a él?",options:["Mr.","Mrs.","Miss","Ms."],correct:0},
+{type:"fill",q:"'Miss' se pronuncia: ____.",answers:["mis"]},
+{type:"fill",q:"'Ms.' se pronuncia: ____.",answers:["miz"]},
+{type:"match",q:"Une la situación con el título correcto.",pairs:[["Hombre de 40 años, casado","Mr."],["Mujer de 25, no sabes si casada","Ms."],["Niña de 10 años","Miss"],["Mujer de 50, casada","Mrs."]]},
+{type:"speak",phrase:"Hello, Miss Johnson. How are you today?",translation:"Hola, señorita Johnson. ¿Cómo está hoy?"},
+{type:"tf",q:"Puedes usar 'Ms.' con cualquier mujer, siempre es correcto.",correct:true}
+]},
+
+{id:"possessives",num:12,title:"Posesivos",emoji:"🔑",cardDesc:"Possessive nouns vs possessive adjectives",
+explain:[
+"<p>Este es el tema que más confunde. Hay <b>dos sistemas</b> distintos:</p>",
+"<p class='sectionlabel'>① Possessive nouns — las 3 reglas del apóstrofe</p>",
+"<div class='rulecards'><div class='rulecard'><span class='rulehead'>Regla 1 · Sustantivo singular → 's</span><div class='ruleformula'>the teacher's book = el libro del maestro</div><div class='ruleex'>Sara's phone · Mr. García's car</div></div><div class='rulecard'><span class='rulehead'>Regla 2 · Plural terminado en -s → solo '</span><div class='ruleformula'>the students' books = los libros de los estudiantes</div><div class='ruleex'>the teachers' rooms · the boys' backpacks</div></div><div class='rulecard'><span class='rulehead'>Regla 3 · Plural irregular (no -s) → 's</span><div class='ruleformula'>the children's toys</div><div class='ruleex'>the men's shoes · the women's team</div></div></div>",
+"<table class='reftable'><tr><th>Forma</th><th>Significado</th><th>Ejemplo</th></tr><tr><td class='formcol'>Sara's</td><td>Pertenece a Sara</td><td>Sara's book</td></tr><tr><td class='formcol'>its</td><td>Pertenece a 'eso' (¡sin apóstrofe!)</td><td>The cat licks its paw.</td></tr><tr><td class='formcol'>it's</td><td>= it is (contracción)</td><td>It's a big cat.</td></tr></table>",
+"<p class='sectionlabel'>② Possessive adjectives — antes del sustantivo</p>",
+"<table class='reftable'><tr><th>Subject</th><th>Possessive Adj.</th><th>Ejemplo</th></tr><tr><td>I</td><td class='formcol'>my</td><td>my book</td></tr><tr><td>You</td><td class='formcol'>your</td><td>your phone</td></tr><tr><td>He</td><td class='formcol'>his</td><td>his car</td></tr><tr><td>She</td><td class='formcol'>her</td><td>her bag</td></tr><tr><td>It</td><td class='formcol'>its</td><td>its name</td></tr><tr><td>We</td><td class='formcol'>our</td><td>our class</td></tr><tr><td>They</td><td class='formcol'>their</td><td>their books</td></tr></table>",
+"<div class='keynote'><span class='keyhead'>⚠️ Diferencia clave: He → his · She → her · They → their · We → our</span><div class='keyrow'>'He is my brother.' (sujeto) → 'His car is red.' (posesivo + sustantivo)</div><div class='keyrow'>Si terminas los 20 ejercicios y tienes dudas — ¡vuelve a esta tabla!</div></div>"
+],
+video:"kj-iIE1RGss",videoNote:"Possessive Adjectives: my your his her its our their",
+exercises:[
+{type:"mcq",q:"Sara tiene un teléfono nuevo. ¿Cómo expresas posesión? (Regla 1: singular)",options:["Sara's phone","Saras' phone","Sara' phone"],correct:0},
+{type:"mcq",q:"Los maestros comparten una sala. ¿Correcto? (Regla 2: plural en -s)",options:["the teacher's room","the teachers' room","the teachers's room"],correct:1},
+{type:"mcq",q:"Los juguetes de los niños (children = plural irregular). ¿Correcto? (Regla 3)",options:["the childrens' toys","the children's toys","the childs' toys"],correct:1},
+{type:"fill",q:"The dog is licking ____ paw. (pertenece al perro — ¡sin apóstrofe!)",answers:["its"]},
+{type:"fill",q:"____ raining today. (= it is)",answers:["it's"]},
+{type:"mcq",q:"¿Cuál oración está MAL escrita?",options:["Sara's book is here.","The cat licks it's paw.","It's a sunny day."],correct:1},
+{type:"match",q:"Une la oración con el posesivo correcto.",pairs:[["She is a teacher. ____ name is Ana.","Her"],["He is my brother. ____ car is red.","His"],["They are students. ____ books are new.","Their"],["We are friends. ____ class starts at 9.","Our"]]},
+{type:"tf",q:"'He is my brother' — 'He' es un pronombre SUJETO, no un posesivo.",correct:true},
+{type:"fill",q:"Bruce is Katie's boss. This is ____ office. (de Bruce)",answers:["his"]},
+{type:"mcq",q:"My sister has a car. ¿Cómo dices 'el carro de mi hermana' con posesivo?",options:["She car","Her car","Hers car"],correct:1},
+{type:"order",q:"Ordena usando posesivo:",words:["book.","my","This","is"],correct:"This is my book."},
+{type:"order",q:"Ordena:",words:["name.","What","your","is","?"],correct:"What is your name ?"},
+{type:"speak",phrase:"This is my book. That is her pen.",translation:"Este es mi libro. Esa es su pluma (de ella)."},
+{type:"speak",phrase:"His name is Carlos. Her name is Ana.",translation:"Su nombre (de él) es Carlos. Su nombre (de ella) es Ana."},
+{type:"fill",q:"This is ____ house. (nuestra casa)",answers:["our"]},
+{type:"fill",q:"Is this ____ bag? (de ellos)",answers:["their"]},
+{type:"mcq",q:"¿Cuál es correcto para 'the toy of the dog'?",options:["the dog's toy","the dogs' toy","the dog' toy"],correct:0},
+{type:"tf",q:"'Its' sin apóstrofe es un adjetivo posesivo (pertenece a algo). 'It's' CON apóstrofe = 'it is'.",correct:true},
+{type:"fill",q:"The cat has a toy. → The cat has ____ toy.",answers:["its"]},
+{type:"match",q:"Une para completar la oración con el posesivo correcto.",pairs:[["I love __ teacher.","my"],["Do you have __ phone?","your"],["That is __ car. (ella)","her"],["We forgot __ books.","our"]]}
+]},
+
+{id:"numbers",num:13,title:"Números, teléfono y correo",emoji:"📞",cardDesc:"0-20, cómo decir un teléfono y un email",
+explain:[
+"<p>0-20: <span class='ex-en'>zero, one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty</span>.</p>",
+"<p>Teléfono: cada dígito por separado, 0 = 'oh'. Correo: @ = at · . = dot · _ = underscore · - = hyphen.</p>"
+],
+video:"DNcnKzZ11v0",videoNote:"Numbers 1-20 in English | Vocabulary",
+tool:{hint:"Toca un número para escuchar cómo se dice en inglés 🔊",items:[
+{label:"0",speak:"zero",phon:"zero"},{label:"1",speak:"one",phon:"one"},{label:"2",speak:"two",phon:"two"},
+{label:"3",speak:"three",phon:"three"},{label:"4",speak:"four",phon:"four"},{label:"5",speak:"five",phon:"five"},
+{label:"6",speak:"six",phon:"six"},{label:"7",speak:"seven",phon:"seven"},{label:"8",speak:"eight",phon:"eight"},
+{label:"9",speak:"nine",phon:"nine"},{label:"10",speak:"ten",phon:"ten"},{label:"11",speak:"eleven",phon:"eleven"},
+{label:"12",speak:"twelve",phon:"twelve"},{label:"13",speak:"thirteen",phon:"thirteen"},{label:"14",speak:"fourteen",phon:"fourteen"},
+{label:"15",speak:"fifteen",phon:"fifteen"},{label:"16",speak:"sixteen",phon:"sixteen"},{label:"17",speak:"seventeen",phon:"seventeen"},
+{label:"18",speak:"eighteen",phon:"eighteen"},{label:"19",speak:"nineteen",phon:"nineteen"},{label:"20",speak:"twenty",phon:"twenty"}]},
+exercises:[
+{type:"fill",q:"15 en inglés: ____",answers:["fifteen"]},
+{type:"mcq",q:"¿Cómo se dice '0' en un número de teléfono?",options:["zero","oh","null"],correct:1},
+{type:"fill",q:"El símbolo '@' en correos: ____",answers:["at"]},
+{type:"mcq",q:"¿Cómo se dice '.' en correos?",options:["dot","point","hyphen"],correct:0},
+{type:"fill",q:"8 en inglés: ____",answers:["eight"]},
+{type:"fill",q:"12 en inglés: ____",answers:["twelve"]},
+{type:"mcq",q:"'Twenty' en español:",options:["Diez","Veinte","Doce"],correct:1},
+{type:"match",q:"Une el número con su palabra.",pairs:[["3","three"],["7","seven"],["11","eleven"],["16","sixteen"],["19","nineteen"]]},
+{type:"tf",q:"'nine' = 9.",correct:true},
+{type:"fill",q:"El símbolo '-' en correos: ____",answers:["hyphen"]},
+{type:"order",q:"Ordena cómo preguntar el número de teléfono:",words:["number?","your","What's","phone"],correct:"What's your phone number?"},
+{type:"speak",phrase:"My phone number is five-five-five, one-two-three-four.",translation:"Mi número de teléfono es 555-1234."},
+{type:"speak",phrase:"My email is maria at gmail dot com.",translation:"Mi correo es maria@gmail.com"},
+{type:"fill",q:"13 en inglés: ____",answers:["thirteen"]},
+{type:"fill",q:"17 en inglés: ____",answers:["seventeen"]},
+{type:"mcq",q:"¿Cuánto es 'eighteen'?",options:["15","17","18","19"],correct:2},
+{type:"match",q:"Une los números.",pairs:[["one","1"],["five","5"],["ten","10"],["twenty","20"]]},
+{type:"tf",q:"En un teléfono, el 0 siempre se dice 'zero' (nunca 'oh').",correct:false},
+{type:"speak",phrase:"My name is Ana. A-N-A.",translation:"Mi nombre es Ana. A-N-A. (deletreando)"},
+{type:"fill",q:"El símbolo '_' en correos: ____",answers:["underscore"]}
+]},
+
+{id:"yesno",num:14,title:"Preguntas Yes/No con Be",emoji:"❓",cardDesc:"Is she...? Are they...? + respuestas cortas",
+explain:[
+"<p>Para preguntar con be, invertimos el orden: <b>Subject + be → Be + Subject.</b> Ej: <span class='ex-en'>She is a teacher. → Is she a teacher?</span></p>",
+"<p>Respuestas cortas: <span class='ex-en'>Yes, she is. / No, she isn't.</span> ⚠️ En afirmativo NUNCA contraer: <b>Yes, I am</b> (no 'Yes, I'm').</p>"
+],
+video:"Y8Xo56e7LeQ",videoNote:"Yes/No Questions and Short Answers with Be",
+exercises:[
+{type:"mcq",q:"Convierte: 'They are students.' →",options:["They are students?","Are they students?","Do they are students?"],correct:1},
+{type:"fill",q:"Is Anna a teacher? (Sí) → ____, she ____.",answers:["yes, she is","yes she is"]},
+{type:"mcq",q:"¿Cuál respuesta es INCORRECTA?",options:["Yes, I am.","No, I'm not.","Yes, I'm."],correct:2},
+{type:"fill",q:"'Yes, they are neighbors.' → ¿Cuál fue la pregunta? ____",answers:["are they neighbors","are they neighbors?"]},
+{type:"fill",q:"'He is tired.' → ____ he tired?",answers:["is"]},
+{type:"mcq",q:"'Are you a student?' → Respuesta negativa corta:",options:["No, I not.","No, I'm not.","No, not I am."],correct:1},
+{type:"tf",q:"Para preguntas sí/no con 'be', el verbo va ANTES del sujeto.",correct:true},
+{type:"match",q:"Une la pregunta con su respuesta corta.",pairs:[["Is she a teacher?","Yes, she is."],["Are they ready?","No, they aren't."],["Am I right?","Yes, you are."],["Is it cold?","No, it isn't."]]},
+{type:"fill",q:"'We are neighbors.' → ____ neighbors?",answers:["are we"]},
+{type:"mcq",q:"¿Cuál pregunta es correcta para 'They are doctors.'?",options:["They are doctors?","Are they doctors?","Do they are doctors?"],correct:1},
+{type:"order",q:"Convierte a pregunta:",words:["a","Is","teacher","she","?"],correct:"Is she a teacher ?"},
+{type:"order",q:"Convierte a pregunta:",words:["students?","Are","they"],correct:"Are they students?"},
+{type:"speak",phrase:"Are you a student? Yes, I am.",translation:"¿Eres estudiante? Sí, lo soy."},
+{type:"speak",phrase:"Is she from Mexico? No, she isn't.",translation:"¿Es ella de México? No, no lo es."},
+{type:"fill",q:"Is he a doctor? ____, he is. (respuesta afirmativa)",answers:["yes"]},
+{type:"fill",q:"Are they ready? No, they ____.",answers:["aren't"]},
+{type:"mcq",q:"¿Cuál respuesta afirmativa es CORRECTA?",options:["Yes, she's.","Yes, she is.","Yes, is she."],correct:1},
+{type:"tf",q:"'Is it?' puede ser una pregunta completa (ejemplo: 'Oh, is it?').",correct:true},
+{type:"match",q:"Une la pregunta con la respuesta más lógica.",pairs:[["Are you cold?","Yes, I am. Very cold!"],["Is he a pilot?","No, he isn't. He's a chef."],["Are they happy?","Yes, they are!"],["Is it sunny?","No, it isn't. It's cloudy."]]},
+{type:"speak",phrase:"Are you from Guadalajara? Yes, I am!",translation:"¿Eres de Guadalajara? ¡Sí!"}
+]},
+
+{id:"whbe",num:15,title:"Preguntas Wh- con Be",emoji:"🛰️",cardDesc:"What, Where, Who + el verbo be",
+explain:[
+"<p><b>What</b> = cosas/nombres · <b>Where</b> = lugares · <b>Who</b> = personas.</p>",
+"<p>Estructura: <b>Wh- + be + subject?</b> Ej: <span class='ex-en'>What is your name? Where are they from? Who's that?</span></p>"
+],
+video:"lLJFYIvFWOY",videoNote:"Wh- Questions with Be — Beginner English",
+exercises:[
+{type:"mcq",q:"'She's from Mexico.' → ¿Cuál fue la pregunta?",options:["What's her name?","Where's she from?","Who's she?"],correct:1},
+{type:"fill",q:"____ is your name? → My name is Carlos.",answers:["what"]},
+{type:"mcq",q:"'He's my brother.' → ¿Con qué palabra empieza la pregunta?",options:["What","Where","Who"],correct:2},
+{type:"fill",q:"____ are they from? → They're from Canada.",answers:["where"]},
+{type:"fill",q:"____ are you from? → I'm from Jalisco.",answers:["where"]},
+{type:"mcq",q:"'____ is that?' → 'That's my teacher.'",options:["What","Where","Who"],correct:2},
+{type:"tf",q:"'Where' se usa para preguntar sobre personas.",correct:false},
+{type:"match",q:"Une la palabra con su uso.",pairs:[["What","cosas o nombres"],["Where","lugares"],["Who","personas"]]},
+{type:"fill",q:"____'s your favorite color? → My favorite color is blue.",answers:["what"]},
+{type:"mcq",q:"'They're at school.' → ¿Cuál fue la pregunta?",options:["What are they?","Where are they?","Who are they?"],correct:1},
+{type:"order",q:"Forma la pregunta:",words:["your","What","name","is","?"],correct:"What is your name ?"},
+{type:"order",q:"Forma la pregunta:",words:["she","from","Where","is","?"],correct:"Where is she from ?"},
+{type:"speak",phrase:"What's your name? My name is Ana.",translation:"¿Cómo te llamas? Me llamo Ana."},
+{type:"speak",phrase:"Where are you from? I'm from Mexico.",translation:"¿De dónde eres? Soy de México."},
+{type:"fill",q:"____ is she? → She's my sister. (¿Quién?)",answers:["who"]},
+{type:"mcq",q:"¿Cuál pregunta corresponde a 'He's 25 years old.'?",options:["What's his name?","How old is he?","Where is he?"],correct:1},
+{type:"tf",q:"'What's' es la contracción de 'What is'.",correct:true},
+{type:"match",q:"Une la pregunta con su respuesta.",pairs:[["What's your name?","I'm Luis."],["Where are you from?","I'm from Guadalajara."],["Who's that?","That's my teacher."],["What do you do?","I'm a student."]]},
+{type:"speak",phrase:"Who is that? That's my friend Carlos.",translation:"¿Quién es ese? Ese es mi amigo Carlos."},
+{type:"fill",q:"____ is your email? → It's luis@gmail.com",answers:["what"]}
+]}
+]);
+</script>
+<script>
+// ── VOCAB STATIONS 13-15 ──
+TOPICS.push(...[
+{id:"food",num:4,title:"Comidas y alimentos",emoji:"🍎",cardDesc:"Frutas, verduras, lácteos, mariscos y más",isVocab:true,
+explain:["<p>Vocabulario esencial de alimentos en inglés. Toca las tarjetas para escuchar cada palabra. Después practica con los ejercicios.</p>"],
+video:"8V9-mWoXqZA",videoNote:"Food Vocabulary in English | Fruits Vegetables Dairy",
+vocab:[
+{cat:"🍎 Fruits",items:[{e:"🍎",w:"apple",p:"apple"},{e:"🍌",w:"banana",p:"banana"},{e:"🍓",w:"strawberry",p:"strawberry"},{e:"🍇",w:"grapes",p:"greips"},{e:"🍊",w:"orange",p:"orange"},{e:"🍋",w:"lemon",p:"lemon"},{e:"🍍",w:"pineapple",p:"pineapple"},{e:"🍉",w:"watermelon",p:"watermelon"},{e:"🍑",w:"peach",p:"piich"},{e:"🍈",w:"melon",p:"melon"}]},
+{cat:"🥦 Vegetables",items:[{e:"🥦",w:"broccoli",p:"brókoli"},{e:"🥕",w:"carrot",p:"kárrot"},{e:"🌽",w:"corn",p:"corn"},{e:"🥑",w:"avocado",p:"avokado"},{e:"🍅",w:"tomato",p:"toméito"},{e:"🧅",w:"onion",p:"ónion"},{e:"🥔",w:"potato",p:"potéito"},{e:"🥬",w:"lettuce",p:"létes"},{e:"🫑",w:"pepper",p:"péper"},{e:"🧄",w:"garlic",p:"garlik"}]},
+{cat:"🥛 Dairy & Proteins",items:[{e:"🥛",w:"milk",p:"milk"},{e:"🧀",w:"cheese",p:"chiis"},{e:"🥚",w:"egg",p:"eg"},{e:"🧈",w:"butter",p:"báter"},{e:"🍦",w:"ice cream",p:"ais-kriim"},{e:"🥩",w:"meat",p:"miit"},{e:"🍗",w:"chicken",p:"chiken"},{e:"🥓",w:"bacon",p:"béikon"}]},
+{cat:"🦞 Seafood",items:[{e:"🐟",w:"fish",p:"fish"},{e:"🦐",w:"shrimp",p:"shrimp"},{e:"🦞",w:"lobster",p:"lobster"},{e:"🦑",w:"squid",p:"skwid"},{e:"🐙",w:"octopus",p:"óktopus"},{e:"🦀",w:"crab",p:"krab"},{e:"🐠",w:"tuna",p:"tiuna"},{e:"🐚",w:"clam",p:"klam"}]}
+],
+exercises:[
+{type:"emoji",q:"¿Qué emoji representa 'banana'?",options:["🍎","🍌","🍊","🍋"],correct:1},
+{type:"emoji",q:"¿Qué emoji representa 'carrot'?",options:["🥦","🥕","🌽","🥬"],correct:1},
+{type:"fill",q:"La fruta roja que en inglés se dice /ápol/: ____",answers:["apple"]},
+{type:"fill",q:"El aguacate en inglés: ____",answers:["avocado"]},
+{type:"mcq",q:"¿Cuál de estas NO es una fruta?",options:["strawberry","banana","lettuce","orange"],correct:2},
+{type:"match",q:"Une el alimento con su categoría.",pairs:[["milk","Dairy"],["tuna","Seafood"],["broccoli","Vegetable"],["apple","Fruit"]]},
+{type:"emoji",q:"¿Qué emoji representa 'shrimp'?",options:["🐟","🦀","🦐","🐙"],correct:2},
+{type:"fill",q:"El tomate en inglés: ____",answers:["tomato"]},
+{type:"mcq",q:"'Dairy products' incluye:",options:["fish and shrimp","milk, cheese and butter","apples and oranges","chicken and bacon"],correct:1},
+{type:"mcq",q:"¿Cómo se llama 'maíz' en inglés?",options:["wheat","rice","corn","oat"],correct:2},
+{type:"order",q:"Ordena la oración de comidas:",words:["an","I","apple","like","."],correct:"I like an apple ."},
+{type:"speak",phrase:"I like apples, bananas, and strawberries.",translation:"Me gustan las manzanas, plátanos y fresas."},
+{type:"match",q:"Une el alimento con su nombre en inglés.",pairs:[["🧀","cheese"],["🥚","egg"],["🐟","fish"],["🥕","carrot"]]},
+{type:"fill",q:"El camarón en inglés: ____",answers:["shrimp"]},
+{type:"tf",q:"'Lobster' es un tipo de mariscos (seafood).",correct:true},
+{type:"mcq",q:"¿Cuál de estos es un producto lácteo (dairy product)?",options:["tuna","carrot","butter","squid"],correct:2},
+{type:"fill",q:"El pollo en inglés: ____",answers:["chicken"]},
+{type:"speak",phrase:"I don't eat meat. I eat fish and vegetables.",translation:"No como carne. Como pescado y verduras."},
+{type:"emoji",q:"¿Qué emoji representa 'watermelon'?",options:["🍊","🍋","🍉","🍇"],correct:2},
+{type:"fill",q:"El limón en inglés: ____",answers:["lemon"]}
+]},
+
+{id:"animals",num:7,title:"Animales",emoji:"🐾",cardDesc:"Animales domésticos, salvajes y sus sonidos",isVocab:true,
+explain:["<p>Vocabulario de animales. En inglés los sonidos de los animales también tienen nombre. Toca las tarjetas para escuchar la pronunciación.</p>"],
+video:"tNi_5C_2GAs",videoNote:"Animals in English | Vocabulary for Beginners",
+vocab:[
+{cat:"🏡 Pets",items:[{e:"🐶",w:"dog",p:"dog"},{e:"🐱",w:"cat",p:"kat"},{e:"🐰",w:"rabbit",p:"rábit"},{e:"🐹",w:"hamster",p:"hámster"},{e:"🐦",w:"parrot",p:"párrot"},{e:"🐠",w:"goldfish",p:"goldfish"}]},
+{cat:"🌿 Farm Animals",items:[{e:"🐄",w:"cow",p:"kau"},{e:"🐷",w:"pig",p:"pig"},{e:"🐔",w:"chicken",p:"chiken"},{e:"🐑",w:"sheep",p:"shiip"},{e:"🐴",w:"horse",p:"hors"},{e:"🐐",w:"goat",p:"gout"}]},
+{cat:"🦁 Wild Animals",items:[{e:"🦁",w:"lion",p:"láion"},{e:"🐘",w:"elephant",p:"élifant"},{e:"🦒",w:"giraffe",p:"yiráf"},{e:"🐯",w:"tiger",p:"táiger"},{e:"🐻",w:"bear",p:"ber"},{e:"🦊",w:"fox",p:"foks"},{e:"🐺",w:"wolf",p:"wulf"},{e:"🦋",w:"butterfly",p:"báterflai"}]},
+{cat:"🦅 Birds & More",items:[{e:"🦅",w:"eagle",p:"iigol"},{e:"🦆",w:"duck",p:"dok"},{e:"🦉",w:"owl",p:"aul"},{e:"🐍",w:"snake",p:"sneik"},{e:"🐊",w:"crocodile",p:"krókodiil"},{e:"🐸",w:"frog",p:"frog"}]}
+],
+exercises:[
+{type:"emoji",q:"¿Qué emoji representa 'elephant'?",options:["🦁","🐘","🦒","🐯"],correct:1},
+{type:"fill",q:"El gato en inglés: ____",answers:["cat"]},
+{type:"mcq",q:"¿Cuál de estos es un animal doméstico (pet)?",options:["lion","elephant","dog","bear"],correct:2},
+{type:"emoji",q:"¿Qué emoji representa 'butterfly'?",options:["🐦","🦋","🦅","🦉"],correct:1},
+{type:"match",q:"Une el animal con su categoría.",pairs:[["dog","Pet"],["cow","Farm"],["lion","Wild"],["duck","Bird"]]},
+{type:"fill",q:"El caballo en inglés: ____",answers:["horse"]},
+{type:"mcq",q:"'Sheep' es plural e irregular. ¿Cómo se dice 'una oveja'?",options:["a sheeps","a sheep","a sheepies"],correct:1},
+{type:"fill",q:"La jirafa en inglés: ____",answers:["giraffe"]},
+{type:"emoji",q:"¿Qué emoji representa 'wolf'?",options:["🐺","🦊","🐴","🦁"],correct:0},
+{type:"tf",q:"'Fox' en inglés significa 'lobo'.",correct:false},
+{type:"speak",phrase:"I have a dog and a cat at home.",translation:"Tengo un perro y un gato en casa."},
+{type:"match",q:"Une el animal con lo que hace (sonido/acción).",pairs:[["dog","barks"],["cat","meows"],["duck","quacks"],["cow","moos"]]},
+{type:"fill",q:"El cerdo en inglés: ____",answers:["pig"]},
+{type:"mcq",q:"¿Cuál animal vive en el océano?",options:["wolf","eagle","shark","fox"],correct:2},
+{type:"order",q:"Ordena:",words:["a","I","dog","have","."],correct:"I have a dog ."},
+{type:"speak",phrase:"The lion is big. The elephant is very big!",translation:"El león es grande. ¡El elefante es muy grande!"},
+{type:"fill",q:"El búho en inglés: ____",answers:["owl"]},
+{type:"emoji",q:"¿Qué emoji representa 'frog'?",options:["🐍","🐊","🐸","🦎"],correct:2},
+{type:"tf",q:"'Rabbit' y 'hamster' son tipos de mascotas (pets).",correct:true},
+{type:"fill",q:"El pato en inglés: ____",answers:["duck"]}
+]},
+
+{id:"clothes",num:10,title:"Ropa y moda",emoji:"👗",cardDesc:"Prendas, colores y cómo describir outfits",isVocab:true,
+explain:[
+"<p>Para describir lo que alguien lleva puesto: <b>He/She is wearing + prenda(s).</b> Para describir colores: <b>color + clothing.</b> Ej: <span class='ex-en'>She's wearing a red dress.</span></p>",
+"<p>Toca las tarjetas para aprender el vocabulario y después practica con los ejercicios.</p>"
+],
+video:"YH7Rg4TQxdA",videoNote:"Clothes Vocabulary in English | What are you wearing?",
+vocab:[
+{cat:"👔 Tops",items:[{e:"👕",w:"t-shirt",p:"ti-shirt"},{e:"👔",w:"shirt",p:"shirt"},{e:"🧥",w:"jacket",p:"yáket"},{e:"🥼",w:"coat",p:"kout"},{e:"🧣",w:"scarf",p:"skarf"},{e:"🧤",w:"gloves",p:"glovs"},{e:"👒",w:"hat",p:"hat"},{e:"🎩",w:"cap",p:"kap"}]},
+{cat:"👖 Bottoms & Full",items:[{e:"👖",w:"jeans",p:"yiins"},{e:"👗",w:"dress",p:"dres"},{e:"👚",w:"blouse",p:"blaus"},{e:"🩳",w:"shorts",p:"shorts"},{e:"🧦",w:"socks",p:"soks"},{e:"👠",w:"heels",p:"hiils"},{e:"👟",w:"sneakers",p:"snikers"},{e:"👞",w:"shoes",p:"shuuz"}]},
+{cat:"🎨 Colors",items:[{e:"❤️",w:"red",p:"red"},{e:"💙",w:"blue",p:"bluu"},{e:"💚",w:"green",p:"griin"},{e:"🖤",w:"black",p:"blak"},{e:"🤍",w:"white",p:"wait"},{e:"💛",w:"yellow",p:"iélou"},{e:"🟠",w:"orange",p:"óranch"},{e:"💜",w:"purple",p:"pérpol"}]}
+],
+exercises:[
+{type:"emoji",q:"¿Qué emoji representa 'dress'?",options:["👕","👗","👖","🧥"],correct:1},
+{type:"fill",q:"Los jeans en inglés: ____",answers:["jeans"]},
+{type:"mcq",q:"¿Cómo dices 'Ella lleva un vestido rojo'?",options:["She wearing a red dress.","She's wearing a red dress.","She wear a red dress."],correct:1},
+{type:"fill",q:"El color azul en inglés: ____",answers:["blue"]},
+{type:"match",q:"Une la prenda con su categoría.",pairs:[["t-shirt","Top"],["jeans","Bottom"],["sneakers","Footwear"],["scarf","Accessory"]]},
+{type:"emoji",q:"¿Qué emoji representa 'sneakers'?",options:["👠","👞","👟","🥾"],correct:2},
+{type:"fill",q:"El color negro en inglés: ____",answers:["black"]},
+{type:"mcq",q:"¿Cuál prenda vas arriba? (top)",options:["jeans","shorts","shirt","socks"],correct:2},
+{type:"speak",phrase:"I'm wearing a blue t-shirt and black jeans.",translation:"Llevo puesta una camiseta azul y jeans negros."},
+{type:"fill",q:"Los calcetines en inglés: ____",answers:["socks"]},
+{type:"order",q:"Ordena para describir la ropa:",words:["wearing","He's","a","coat.","green"],correct:"He's wearing a green coat."},
+{type:"match",q:"Une el color con su emoji.",pairs:[["red","❤️"],["blue","💙"],["yellow","💛"],["white","🤍"]]},
+{type:"fill",q:"El gorro/sombrero en inglés: ____",answers:["hat"]},
+{type:"mcq",q:"¿Qué prenda protege del frío en las manos?",options:["gloves","socks","scarf","hat"],correct:0},
+{type:"speak",phrase:"What are you wearing today?",translation:"¿Qué ropa llevas hoy?"},
+{type:"tf",q:"'Jeans' es siempre plural en inglés (no se dice 'a jean').",correct:true},
+{type:"fill",q:"El color blanco en inglés: ____",answers:["white"]},
+{type:"emoji",q:"¿Qué emoji representa 'gloves'?",options:["🧣","🧤","🎩","👒"],correct:1},
+{type:"mcq",q:"¿Cómo preguntas qué ropa lleva alguien?",options:["What are you wearing?","What you wear?","What do wearing you?"],correct:0},
+{type:"fill",q:"Los tacones en inglés: ____",answers:["heels"]}
+]}
+]);
+</script>
+<script>
+// ── CONVERSATION STATION (Topic 16) ──
+TOPICS.push({
+  id:"conversation",num:16,title:"Sala de Conversación",emoji:"💬",
+  cardDesc:"Practica hablando con Alex — con micrófono y voz",
+  isChat:true,
+  explain:["<p>Practica conversaciones reales con <b>Alex</b>, tu compañero virtual. Elige un escenario, usa el micrófono 🎤 para hablar, o escribe. Alex te responde en inglés y también puede hablar. ¡El objetivo es practicar lo que ya sabes!</p>"]
+});
+
+const CHAT_SCENARIOS = {
+  intro:{
+    name:"👋 Meeting Someone",
+    hint:"Conócete con alguien nuevo en clase",
+    steps:[
+      {bot:"Hey! What's up? I'm Alex — nice to meet you! What's your name?", sugg:["Hey! I'm [your name].","Hi Alex! My name is...","What's up! I'm..."], expect:["i'm","my name is","i am","hey","hi"]},
+      {bot:"Cool! Nice to meet you! Where you from?", sugg:["I'm from Guadalajara.","I'm from Mexico.","I'm from [city]."], expect:["i'm from","i am from","from"]},
+      {bot:"Cool! And what do you do? Are you a student?", sugg:["Yes, I'm a student.","I'm a student at GCI.","Yes, I am! And you?"], expect:["student","yes i am","yes i'm","i'm a"]},
+      {bot:"Me too! I'm also a student here. So how's it going?", sugg:["I'm doing good, thanks!","Pretty good! And you?","Not bad at all!"], expect:["doing good","doing great","pretty good","good","not bad","great","fine","okay"]},
+      {bot:"I'm great, thank you! What's your phone number? Just for practice 😄", sugg:["My number is 555-1234.","It's 333-456-7890.","My phone number is..."], expect:["my number","it's","my phone","555","333"]},
+      {bot:"Got it! And your email?", sugg:["My email is [name] at gmail dot com.","It's [name] at yahoo dot com.","My email is..."], expect:["at","email","gmail","yahoo","hotmail"]},
+      {bot:"Perfect! It was great talking to you! See you later! 😊", sugg:["See you later!","Goodbye, Alex!","Take care!"], expect:["see you","bye","goodbye","take care","later"]},
+    ]
+  },
+  school:{
+    name:"📚 At School",
+    hint:"Una conversación en el salón de clase",
+    steps:[
+      {bot:"Hey, good morning! You in the English class?", sugg:["Yes, I am! Good morning!","Good morning! Yes, I'm a student here.","Yes! And you?"], expect:["yes","good morning","i am","i'm"]},
+      {bot:"Great! I'm Alex, the new student. Nice to meet you!", sugg:["Nice to meet you too, Alex!","Welcome! I'm [name].","Hi Alex! I'm [name], nice to meet you!"], expect:["nice to meet","welcome","hi","hello"]},
+      {bot:"Thanks! Is this seat taken? Is Mr. or Ms. [teacher] your teacher?", sugg:["No, it's free! And yes, she's our teacher.","Yes, he's our English teacher!","No, sit down! Our teacher is Ms. García."], expect:["teacher","she's","he's","yes","no","free","sit"]},
+      {bot:"Oh nice! How is the class? Is it difficult?", sugg:["It's not bad! It's interesting.","It's great! I like English.","A little difficult but fun!"], expect:["it's","not bad","great","good","interesting","fun","like"]},
+      {bot:"That's good! What's your favorite subject?", sugg:["My favorite subject is English!","I like Math and English.","English is my favorite!"], expect:["english","favorite","like","math","science"]},
+      {bot:"Mine too! Hey, what time is the class?", sugg:["It's at 9 AM.","The class is at 10 in the morning.","It starts at 8 o'clock."], expect:["at","o'clock","morning","am","pm","time","class"]},
+      {bot:"Thanks! See you in class. Goodbye! 😊", sugg:["Goodbye! See you later!","Bye! See you in class!","Take care, Alex!"], expect:["bye","goodbye","see you","take care","later"]},
+    ]
+  },
+  info:{
+    name:"📋 Personal Info",
+    hint:"Comparte y pregunta información personal",
+    steps:[
+      {bot:"Hello! Can I ask you some questions for a form? What's your full name?", sugg:["My name is [First] [Last].","My full name is...","Sure! My name is..."], expect:["my name","i'm","name is"]},
+      {bot:"Thank you! Is your first name [name]? How do you spell your last name?", sugg:["Yes! My last name is [name], it's [letters].","It's spelled [A-B-C...].","My last name is García: G-A-R-C-I-A."], expect:["yes","my last name","spelled","it's","garcia","gomez","lopez","martinez"]},
+      {bot:"Perfect! And where are you from? What's your nationality?", sugg:["I'm Mexican. I'm from Guadalajara.","I'm from Mexico City.","I'm Mexican, from Jalisco."], expect:["mexican","mexico","guadalajara","jalisco","from"]},
+      {bot:"Great! How old are you?", sugg:["I'm [number] years old.","I'm 20 years old.","I'm twenty-two."], expect:["i'm","years old","old","years"]},
+      {bot:"And what's your phone number?", sugg:["My number is 333-456-7890.","It's five-five-five, one-two-three-four.","My phone number is..."], expect:["my number","it's","333","555","phone"]},
+      {bot:"What's your email address?", sugg:["My email is [name] at gmail dot com.","It's [user] at hotmail dot com.","My email address is..."], expect:["at","email","gmail","yahoo","hotmail","dot"]},
+      {bot:"Wonderful! Thank you so much. Have a great day!", sugg:["You too! Goodbye!","Thank you! See you later!","Bye! Have a great day too!"], expect:["you too","bye","goodbye","thank","see you","have"]},
+    ]
+  }
+};
+</script>
+<script>
+// ══════════════════════════════════
+//  CORE STATE + SPEECH
+// ══════════════════════════════════
+const TOTAL_EX = TOPICS.filter(t=>!t.isChat).reduce((a,t)=>a+t.exercises.length,0);
+const progress = {};
+TOPICS.forEach(t=>{ if(!t.isChat) progress[t.id]=new Array(t.exercises.length).fill(false); });
+
+let englishVoice=null;
+function loadVoices(){
+  if(!('speechSynthesis' in window)) return;
+  const list=window.speechSynthesis.getVoices()||[];
+  if(!list.length) return;
+  const pref=["Google US English","Microsoft Zira","Microsoft David","Samantha","Alex","Karen"];
+  englishVoice=list.find(v=>pref.includes(v.name)&&v.lang&&v.lang.toLowerCase().startsWith('en'))
+    ||list.find(v=>v.lang==='en-US')||list.find(v=>v.lang&&v.lang.toLowerCase().startsWith('en-'))||null;
+}
+if('speechSynthesis' in window){ loadVoices(); window.speechSynthesis.onvoiceschanged=loadVoices; }
+function speak(text,rate){
+  if(!('speechSynthesis' in window)) return;
+  if(!englishVoice) loadVoices();
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    if(englishVoice){u.voice=englishVoice;u.lang=englishVoice.lang;}else{u.lang='en-US';}
+    u.rate=rate||0.82;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+// SpeechRecognition setup
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition||null;
+let activeRecognizer=null;
+function createRecognizer(onResult,onEnd){
+  if(!SR) return null;
+  const r=new SR();
+  r.lang='en-US'; r.continuous=false; r.interimResults=false;
+  r.onresult=e=>{ const t=e.results[0][0].transcript; onResult(t); };
+  r.onend=onEnd||function(){};
+  r.onerror=()=>{ onEnd&&onEnd(); };
+  return r;
+}
+
+function norm(s){ return (s||'').toLowerCase().replace(/[.,!?¿¡']/g,'').trim().replace(/\s+/g,' '); }
+function totalScore(){ let s=0; Object.values(progress).forEach(a=>a.forEach(v=>{if(v)s++;})); return s; }
+function updatePill(){ document.getElementById('scoreText').textContent=totalScore()+'/'+TOTAL_EX; }
+function topicDone(t){ return progress[t.id].every(v=>v); }
+function topicCount(t){ return progress[t.id].filter(v=>v).length; }
+
+// ══════════════════════════════════
+//  MAP
+// ══════════════════════════════════
+function renderMap(){
+  const list=document.getElementById('pathList');
+  list.innerHTML='';
+  const _sorted=[...TOPICS].sort((a,b)=>a.num-b.num);
+  _sorted.forEach((t,i)=>{
+    const color=COLORS[i%COLORS.length];
+    const done=t.isChat ? false : topicDone(t);
+    const n=document.createElement('div');
+    n.className='node'+(done?' done':'');
+    n.style.animationDelay=(i*.04)+'s';
+    n.onclick=()=>openTopic(t.id);
+    const stat=t.isChat?'🎤 Chat':done?'✓ Listo':topicCount(t)+'/'+t.exercises.length;
+    n.innerHTML=`<span class="nnum">#${t.num}</span>
+      <div class="nbadge" style="background:linear-gradient(145deg,${color},${color}cc);box-shadow:0 5px 14px ${color}55;">${t.emoji}</div>
+      <div class="ninfo"><h3>${t.title}</h3><p>${t.cardDesc}</p></div>
+      <div class="nstat">${stat}</div>`;
+    list.appendChild(n);
+  });
+  updatePill();
+}
+
+function goMap(){
+  document.getElementById('mapview').style.display='block';
+  document.getElementById('topicview').classList.remove('active');
+  if(activeRecognizer){try{activeRecognizer.stop();}catch(e){}} activeRecognizer=null;
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  renderMap();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══════════════════════════════════
+//  TOPIC VIEW
+// ══════════════════════════════════
+function openTopic(id){
+  const t=TOPICS.find(x=>x.id===id);
+  const i=TOPICS.indexOf(t);
+  const color=COLORS[i%COLORS.length];
+  document.getElementById('mapview').style.display='none';
+  document.getElementById('topicview').classList.add('active');
+  document.getElementById('tvBadge').style.background=`linear-gradient(145deg,${color},${color}cc)`;
+  document.getElementById('tvBadge').textContent=t.emoji;
+  document.getElementById('tvTitle').textContent=t.title;
+  document.getElementById('tvSub').textContent='Estación '+t.num+' de '+TOPICS.length;
+  document.getElementById('tvExplainBody').innerHTML=(t.explain||[]).join('');
+
+  // video
+  const vc=document.getElementById('tvVideoCard');
+  if(t.video){
+    vc.style.display='block';
+    const wrap=document.getElementById('tvVideoWrap');
+    wrap.className='videoplaceholder';
+    wrap.innerHTML=`<img src="https://img.youtube.com/vi/${t.video}/hqdefault.jpg" alt="${t.videoNote}" loading="lazy"><div class="playbtn">▶</div><div class="playlabel">Toca para reproducir</div>`;
+    wrap.onclick=function(){
+      wrap.className='videowrap'; wrap.onclick=null;
+      wrap.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${t.video}?rel=0&autoplay=1" title="${t.videoNote}" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>`;
+    };
+    document.getElementById('tvVideoNote').textContent=t.videoNote||'';
+    document.getElementById('tvVideoFallback').href=`https://www.youtube.com/watch?v=${t.video}`;
+  } else { vc.style.display='none'; }
+
+  // pronunciation tool
+  const tc=document.getElementById('tvToolCard'), tb=document.getElementById('tvToolBody');
+  tb.innerHTML='';
+  if(t.tool){
+    tc.style.display='block';
+    const hint=document.createElement('p'); hint.className='toolhint'; hint.textContent=t.tool.hint;
+    const grid=document.createElement('div'); grid.className='toolgrid';
+    const disp=document.createElement('div'); disp.className='tooldisplay';
+    const warn=document.createElement('div'); warn.className='toolwarn';
+    warn.textContent='⚠️ No encontramos voz en inglés en este dispositivo. Para mejor experiencia usa Chrome en computadora e instala el paquete de voz inglés en tu sistema.';
+    t.tool.items.forEach(item=>{
+      const b=document.createElement('button'); b.className='toolbtn'; b.textContent=item.label;
+      b.onclick=()=>{ speak(item.speak); disp.innerHTML=`<b>${item.label}</b> = "${item.phon}"`; b.classList.remove('playing'); void b.offsetWidth; b.classList.add('playing'); if(!englishVoice) warn.classList.add('show'); };
+      grid.appendChild(b);
+    });
+    tb.appendChild(hint); tb.appendChild(grid); tb.appendChild(disp); tb.appendChild(warn);
+  } else { tc.style.display='none'; }
+
+  // vocab cards
+  const vc2=document.getElementById('tvVocabCard'), vb=document.getElementById('tvVocabBody');
+  vb.innerHTML='';
+  if(t.vocab){
+    vc2.style.display='block';
+    t.vocab.forEach(cat=>{
+      const cl=document.createElement('div'); cl.className='vcategory'; cl.textContent=cat.cat;
+      const grid=document.createElement('div'); grid.className='vocabgrid';
+      cat.items.forEach(item=>{
+        const c=document.createElement('div'); c.className='vocabcard';
+        c.innerHTML=`<span class="vcemoji">${item.e}</span><span class="vcword">${item.w}</span><span class="vcpron">/${item.p}/</span>`;
+        c.onclick=()=>{ speak(item.w); c.classList.remove('playing'); void c.offsetWidth; c.classList.add('playing'); setTimeout(()=>c.classList.remove('playing'),700); };
+        grid.appendChild(c);
+      });
+      vb.appendChild(cl); vb.appendChild(grid);
+    });
+  } else { vc2.style.display='none'; }
+
+  // exercises vs chat
+  document.getElementById('tvChatSection').style.display=t.isChat?'block':'none';
+  document.getElementById('tvExercises').innerHTML='';
+  if(t.isChat){
+    document.getElementById('tvVideoCard').style.display='none';
+    renderChat();
+  } else {
+    renderExercises(t);
+  }
+  document.getElementById('tvDone').classList.remove('show');
+  if(!t.isChat && topicDone(t)) document.getElementById('tvDone').classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══════════════════════════════════
+//  EXERCISE RENDERERS
+// ══════════════════════════════════
+function renderExercises(t){
+  const box=document.getElementById('tvExercises');
+  box.innerHTML='';
+  t.exercises.forEach((ex,idx)=>{
+    const wrap=document.createElement('div');
+    wrap.className='exo'+(progress[t.id][idx]?' solved':'');
+    const tags={mcq:'Opción múltiple',fill:'Completa',tf:'Verdadero o falso',match:'Relaciona',emoji:'Emoji',order:'Ordena',speak:'Pronuncia'};
+    wrap.innerHTML=`<div class="exo-top"><span class="exo-tag">Ej ${idx+1} · ${tags[ex.type]||ex.type}</span><span class="exo-check">${progress[t.id][idx]?'✓':''}</span></div><p class="qtext">${ex.q||''}</p><div class="exo-body"></div>`;
+    box.appendChild(wrap);
+    const body=wrap.querySelector('.exo-body');
+    if(ex.type==='mcq'||ex.type==='tf'||ex.type==='emoji'){
+      const opts=ex.type==='tf'?['Verdadero','Falso']:ex.options;
+      const d=document.createElement('div');
+      d.className=ex.type==='tf'?'tfrow':ex.type==='emoji'?'opts emoji-opts':'opts';
+      opts.forEach((op,oi)=>{
+        const b=document.createElement('button'); b.className='opt'+(ex.type==='emoji'?' opt-emoji':''); b.textContent=op;
+        b.onclick=()=>{
+          if(wrap.classList.contains('solved')) return;
+          const ok=ex.type==='tf'?(oi===0)===ex.correct:oi===ex.correct;
+          if(ok){ b.classList.add('correct'); d.querySelectorAll('.opt').forEach(x=>x.disabled=true); markSolved(t,idx,wrap); }
+          else { b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'),450); }
+        };
+        d.appendChild(b);
+      });
+      body.appendChild(d);
+    } else if(ex.type==='fill'){
+      const row=document.createElement('div'); row.className='fillrow';
+      const inp=document.createElement('input'); inp.type='text'; inp.placeholder='Escribe en inglés…';
+      const btn=document.createElement('button'); btn.className='checkbtn'; btn.textContent='Verificar';
+      const fb=document.createElement('div');
+      inp.onkeydown=e=>{ if(e.key==='Enter') btn.click(); };
+      btn.onclick=()=>{
+        if(wrap.classList.contains('solved')) return;
+        const v=norm(inp.value);
+        const ok=ex.answers.some(a=>norm(a)===v);
+        if(ok){ inp.classList.add('correct'); inp.disabled=true; btn.disabled=true; fb.className='fb ok'; fb.textContent='¡Correcto! 🌟'; markSolved(t,idx,wrap); }
+        else { inp.classList.add('wrong'); setTimeout(()=>inp.classList.remove('wrong'),450); fb.className='fb no'; fb.textContent=ex.hint?'Casi. Pista: '+ex.hint:'Intenta de nuevo.'; }
+        row.parentNode.appendChild(fb);
+      };
+      row.appendChild(inp); row.appendChild(btn); body.appendChild(row);
+    } else if(ex.type==='match'){
+      renderMatch(ex,wrap,body,t,idx);
+    } else if(ex.type==='order'){
+      renderOrder(ex,wrap,body,t,idx);
+    } else if(ex.type==='speak'){
+      renderSpeak(ex,wrap,body,t,idx);
+    }
+  });
+}
+
+function renderMatch(ex,wrap,body,t,idx){
+  const grid=document.createElement('div'); grid.className='matchgrid';
+  const lc=document.createElement('div'); lc.className='matchcol';
+  const rc=document.createElement('div'); rc.className='matchcol';
+  const lefts=ex.pairs.map((p,pi)=>({label:p[0],pi}));
+  const rights=ex.pairs.map((p,pi)=>({label:p[1],pi}));
+  for(let i=rights.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[rights[i],rights[j]]=[rights[j],rights[i]];}
+  let selL=null,selR=null,matched=0;
+  function tryM(){
+    if(selL===null||selR===null) return;
+    const lb=lc.children[selL.idx],rb=rc.children[selR.idx];
+    if(selL.pi===selR.pi){
+      lb.classList.remove('sel'); rb.classList.remove('sel');
+      lb.classList.add('matched'); rb.classList.add('matched');
+      lb.onclick=null; rb.onclick=null; matched++;
+      if(matched===ex.pairs.length&&!wrap.classList.contains('solved')) markSolved(t,idx,wrap);
+    } else {
+      lb.classList.add('wrong'); rb.classList.add('wrong');
+      setTimeout(()=>{lb.classList.remove('sel','wrong');rb.classList.remove('sel','wrong');},420);
+    }
+    selL=null; selR=null;
+  }
+  lefts.forEach((item,i)=>{
+    const b=document.createElement('button'); b.className='matchitem'; b.textContent=item.label;
+    b.onclick=()=>{
+      if(b.classList.contains('matched')||wrap.classList.contains('solved')) return;
+      lc.querySelectorAll('.matchitem').forEach(x=>{if(!x.classList.contains('matched'))x.classList.remove('sel');});
+      b.classList.add('sel'); selL={pi:item.pi,idx:i}; tryM();
+    };
+    lc.appendChild(b);
+  });
+  rights.forEach((item,i)=>{
+    const b=document.createElement('button'); b.className='matchitem'; b.textContent=item.label;
+    b.onclick=()=>{
+      if(b.classList.contains('matched')||wrap.classList.contains('solved')) return;
+      rc.querySelectorAll('.matchitem').forEach(x=>{if(!x.classList.contains('matched'))x.classList.remove('sel');});
+      b.classList.add('sel'); selR={pi:item.pi,idx:i}; tryM();
+    };
+    rc.appendChild(b);
+  });
+  grid.appendChild(lc); grid.appendChild(rc); body.appendChild(grid);
+  if(progress[t.id][idx]){
+    lc.querySelectorAll('.matchitem').forEach(b=>b.classList.add('matched'));
+    rc.querySelectorAll('.matchitem').forEach(b=>b.classList.add('matched'));
+  }
+}
+
+function renderOrder(ex,wrap,body,t,idx){
+  const shuffled=[...ex.words].sort(()=>Math.random()-.5);
+  const labels=document.createElement('div'); labels.className='order-labels';
+  labels.innerHTML='<span>Palabras disponibles:</span><span>Tu respuesta:</span>';
+  const pool=document.createElement('div'); pool.className='order-pool';
+  const ans=document.createElement('div'); ans.className='order-answer empty';
+  const fb=document.createElement('div');
+  const answer=[];
+  function rebuildPool(){
+    pool.innerHTML='';
+    shuffled.forEach((w,si)=>{
+      if(answer.includes(si)) return;
+      const c=document.createElement('button'); c.className='chip'; c.textContent=w;
+      c.onclick=()=>{
+        if(wrap.classList.contains('solved')) return;
+        answer.push(si); addToAnswer(w,si); rebuildPool(); checkOrder();
+      };
+      pool.appendChild(c);
+    });
+  }
+  function addToAnswer(w,si){
+    ans.classList.remove('empty');
+    const c=document.createElement('button'); c.className='chip in-answer'; c.textContent=w;
+    c.onclick=()=>{
+      if(wrap.classList.contains('solved')) return;
+      const pos=answer.indexOf(si); if(pos>-1) answer.splice(pos,1);
+      c.remove(); if(!ans.children.length) ans.classList.add('empty');
+      rebuildPool(); fb.textContent=''; fb.className='fb';
+    };
+    ans.appendChild(c);
+  }
+  function checkOrder(){
+    if(answer.length!==shuffled.length) return;
+    const built=answer.map(si=>shuffled[si]).join(' ');
+    const ok=norm(built)===norm(ex.correct);
+    if(ok){
+      ans.querySelectorAll('.chip').forEach(c=>c.classList.add('chip-correct'));
+      fb.className='fb ok'; fb.textContent='¡Correcto! 🌟';
+      markSolved(t,idx,wrap);
+    } else {
+      ans.querySelectorAll('.chip').forEach(c=>{ c.classList.add('chip-wrong'); setTimeout(()=>c.classList.remove('chip-wrong'),450); });
+      fb.className='fb no'; fb.textContent='Orden incorrecto. Toca las palabras en azul para quitarlas.';
+    }
+  }
+  rebuildPool();
+  body.appendChild(labels); body.appendChild(pool); body.appendChild(ans); body.appendChild(fb);
+}
+
+function renderSpeak(ex,wrap,body,t,idx){
+  const phrase=document.createElement('div'); phrase.className='speak-phrase';
+  phrase.innerHTML=`<span class="phrase-text">${ex.phrase}</span><span class="phrase-tr">${ex.translation}</span>`;
+  const ctrl=document.createElement('div'); ctrl.className='speak-controls';
+  const mic=document.createElement('button'); mic.className='micbtn'; mic.title='Hablar'; mic.textContent='🎤';
+  const transcript=document.createElement('div'); transcript.className='speak-transcript'; transcript.textContent='Toca 🎤 para hablar…';
+  const result=document.createElement('div'); result.className='speak-result';
+  const playBtn=document.createElement('button'); playBtn.className='speak-playbtn'; playBtn.textContent='▶ Escuchar';
+  playBtn.onclick=()=>speak(ex.phrase,0.75);
+  const markBtn=document.createElement('button'); markBtn.className='speak-markbtn'; markBtn.textContent='✓ Practicado';
+  markBtn.onclick=()=>{ if(!wrap.classList.contains('solved')) markSolved(t,idx,wrap); };
+  const status=document.createElement('div'); status.className='speak-status';
+  if(!SR){ status.textContent='ℹ️ Tu navegador no soporta micrófono. Usa Chrome. Toca ▶ para escuchar, luego "Practicado".'; mic.disabled=true; }
+  else {
+    mic.onclick=()=>{
+      if(activeRecognizer){try{activeRecognizer.stop();}catch(e){}}
+      mic.classList.add('recording'); transcript.textContent='Escuchando…'; status.textContent='';
+      const r=createRecognizer(text=>{
+        transcript.textContent=text;
+        const heard=norm(text), target=norm(ex.phrase);
+        const words=target.split(' ');
+        const matchedW=words.filter(w=>w.length>2&&heard.includes(w)).length;
+        const score=matchedW/words.length;
+        if(score>=0.5||heard===target){
+          transcript.style.color='var(--green)';
+          status.textContent='✅ ¡Excelente pronunciación!';
+          if(!wrap.classList.contains('solved')) markSolved(t,idx,wrap);
+        } else {
+          transcript.style.color='var(--gold)';
+          status.textContent='Sigue practicando — toca ▶ para escuchar el modelo.';
+        }
+      },()=>{ mic.classList.remove('recording'); });
+      activeRecognizer=r;
+      try{ r.start(); }catch(e){ mic.classList.remove('recording'); status.textContent='Error de micrófono. Intenta de nuevo.'; }
+    };
+  }
+  result.appendChild(playBtn); result.appendChild(markBtn);
+  ctrl.appendChild(mic); ctrl.appendChild(transcript);
+  body.appendChild(phrase); body.appendChild(ctrl); body.appendChild(result); body.appendChild(status);
+}
+
+// ══════════════════════════════════
+//  CHAT STATION
+// ══════════════════════════════════
+let chatScenarioKey='intro', chatStep=0, chatMsgCount=0;
+function renderChat(){
+  const pills=document.getElementById('scenarioPills');
+  pills.innerHTML='';
+  Object.entries(CHAT_SCENARIOS).forEach(([key,sc])=>{
+    const p=document.createElement('button'); p.className='scenario-pill'+(key===chatScenarioKey?' active':'');
+    p.textContent=sc.name; p.title=sc.hint;
+    p.onclick=()=>{ chatScenarioKey=key; chatStep=0; chatMsgCount=0; renderChat(); };
+    pills.appendChild(p);
+  });
+  const msgs=document.getElementById('chatMessages');
+  msgs.innerHTML='';
+  chatStep=0; chatMsgCount=0;
+  addBotMsg(CHAT_SCENARIOS[chatScenarioKey].steps[0].bot);
+  updateSuggestions(); updateProgress();
+  const input=document.getElementById('chatInput');
+  input.value=''; input.onkeydown=e=>{ if(e.key==='Enter') chatSend(); };
+  const micBtn=document.getElementById('chatMicBtn');
+  micBtn.onclick=startChatMic;
+}
+
+function addBotMsg(text){
+  const msgs=document.getElementById('chatMessages');
+  const d=document.createElement('div'); d.className='chat-msg bot';
+  const spk=document.createElement('button'); spk.className='chat-speak-btn'; spk.textContent='🔊';
+  spk.onclick=()=>speak(text,0.8);
+  d.innerHTML=`<div class="chat-avatar">🤖</div><div><div class="chat-bubble">${text}</div><div class="chat-hint">Toca 🔊 para escuchar</div></div>`;
+  d.querySelector('.chat-bubble').after(spk);
+  msgs.appendChild(d);
+  setTimeout(()=>{ msgs.scrollTop=msgs.scrollHeight; speak(text,0.82); },150);
+}
+
+function addUserMsg(text){
+  const msgs=document.getElementById('chatMessages');
+  const d=document.createElement('div'); d.className='chat-msg user';
+  d.innerHTML=`<div class="chat-avatar">😊</div><div class="chat-bubble">${text}</div>`;
+  msgs.appendChild(d); chatMsgCount++;
+  setTimeout(()=>msgs.scrollTop=msgs.scrollHeight,50);
+}
+
+function chatSend(){
+  const input=document.getElementById('chatInput');
+  const text=(input.value||'').trim();
+  if(!text) return;
+  input.value='';
+  addUserMsg(text);
+  const sc=CHAT_SCENARIOS[chatScenarioKey];
+  const step=sc.steps[chatStep];
+  const userNorm=norm(text);
+  const matched=step.expect.some(e=>userNorm.includes(e));
+  setTimeout(()=>{
+    if(chatStep<sc.steps.length-1){
+      chatStep++;
+      addBotMsg(sc.steps[chatStep].bot);
+      updateSuggestions(); updateProgress();
+    } else {
+      addBotMsg("Great conversation! 🎉 You did amazing! Try another scenario or come back to practice again. Your English is improving!");
+      document.getElementById('chatSuggestions').innerHTML='<span style="color:var(--green);font-size:13px;font-weight:700;padding:4px;">✅ Conversación completada!</span>';
+      document.getElementById('chatProgress').textContent='🌟 ¡Completaste el escenario! Intenta otro.';
+    }
+    if(!matched && chatStep<sc.steps.length){
+      setTimeout(()=>{
+        const hint=document.createElement('div');
+        hint.className='chat-msg bot';
+        hint.innerHTML=`<div class="chat-avatar">🤖</div><div class="chat-bubble" style="background:rgba(245,179,66,.15);border:1px solid rgba(245,179,66,.3);">💡 Tip: Try using one of the suggested phrases below — they're a great start!</div>`;
+        document.getElementById('chatMessages').appendChild(hint);
+        document.getElementById('chatMessages').scrollTop=999999;
+      },1200);
+    }
+  },600);
+}
+
+function updateSuggestions(){
+  const sc=CHAT_SCENARIOS[chatScenarioKey];
+  const box=document.getElementById('chatSuggestions');
+  if(chatStep>=sc.steps.length){ box.innerHTML=''; return; }
+  box.innerHTML='<span style="font-size:11px;color:var(--ink-soft);width:100%;display:block;margin-bottom:4px;">💬 Sugerencias:</span>';
+  (sc.steps[chatStep].sugg||[]).forEach(s=>{
+    const p=document.createElement('button'); p.className='sugg-pill'; p.textContent=s;
+    p.onclick=()=>{ document.getElementById('chatInput').value=s; document.getElementById('chatInput').focus(); };
+    box.appendChild(p);
+  });
+}
+
+function updateProgress(){
+  const sc=CHAT_SCENARIOS[chatScenarioKey];
+  document.getElementById('chatProgress').textContent=`Paso ${Math.min(chatStep+1,sc.steps.length)} de ${sc.steps.length}`;
+}
+
+function startChatMic(){
+  if(!SR){ alert('Tu navegador no soporta micrófono. Usa Chrome.'); return; }
+  const btn=document.getElementById('chatMicBtn');
+  if(activeRecognizer){try{activeRecognizer.stop();}catch(e){}}
+  btn.classList.add('recording');
+  const r=createRecognizer(text=>{
+    document.getElementById('chatInput').value=text;
+    chatSend();
+  },()=>{ btn.classList.remove('recording'); });
+  activeRecognizer=r;
+  try{ r.start(); }catch(e){ btn.classList.remove('recording'); }
+}
+
+// ══════════════════════════════════
+//  MARK SOLVED + FX
+// ══════════════════════════════════
+function markSolved(t,idx,wrap){
+  progress[t.id][idx]=true;
+  wrap.classList.add('solved');
+  wrap.querySelector('.exo-check').textContent='✓';
+  burstStars(wrap); updatePill();
+  if(topicDone(t)) document.getElementById('tvDone').classList.add('show');
+}
+
+function burstStars(el){
+  const r=el.getBoundingClientRect();
+  for(let i=0;i<8;i++){
+    const s=document.createElement('div'); s.textContent='⭐';
+    s.style.cssText=`position:fixed;left:${r.left+r.width/2}px;top:${r.top+18}px;font-size:${12+Math.random()*10}px;z-index:99;pointer-events:none;`;
+    const dx=(Math.random()-.5)*160, dy=-60-Math.random()*80;
+    s.style.setProperty('--dx',dx+'px'); s.style.setProperty('--dy',dy+'px');
+    s.style.animation='burst .9s ease-out forwards';
+    document.body.appendChild(s); setTimeout(()=>s.remove(),950);
+  }
+}
+
+renderMap();
+</script>
+</body>
+</html>
